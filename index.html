@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RaktSetu – Blood Bank & Hospital Finder | AI-Powered Healthcare</title>
+    <meta name="description"
+        content="RaktSetu is an AI-powered healthcare platform to find blood banks, hospitals, and real-time blood availability near you. Powered by Gemma AI assistant.">
+    <meta name="keywords"
+        content="blood bank, hospital finder, blood availability, healthcare, emergency, Gemma AI, AI assistant">
+    <link rel="icon" href="assets/logo_icon.png" type="image/png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css?v=2">
+</head>
+
+<body>
+
+    <!-- ═══════════════════ SPLASH SCREEN ═══════════════════ -->
+    <div id="splash-screen" class="splash-screen">
+        <div class="splash-content">
+            <div class="splash-logo-ring">
+                <div class="splash-ring"></div>
+                <img src="assets/logo_icon.png" alt="RaktSetu Logo" class="splash-logo-img">
+            </div>
+            <h1 class="splash-title">Rakt<span class="accent">Setu</span></h1>
+            <p class="splash-tagline">Bridging Blood, Saving Lives</p>
+            <div class="splash-loader">
+                <div class="loader-bar"></div>
+            </div>
+        </div>
+        <div class="splash-particles" id="splash-particles"></div>
+    </div>
+
+    <!-- ═══════════════════ NAVIGATION ═══════════════════ -->
+    <nav id="main-nav" class="navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-brand" id="nav-brand">
+                <i class="fas fa-droplet nav-logo-icon"></i>
+                <span class="brand-text">Rakt<span class="accent">Setu</span></span>
+            </a>
+            <div class="nav-links" id="nav-links">
+                <a href="#hero" class="nav-link active" data-section="hero">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <a href="#search-section" class="nav-link" data-section="search-section">
+                    <i class="fas fa-search"></i> Find Blood
+                </a>
+                <a href="#hospitals-section" class="nav-link" data-section="hospitals-section">
+                    <i class="fas fa-hospital"></i> Find Hospitals
+                </a>
+                <a href="#register-section" class="nav-link" data-section="register-section">
+                    <i class="fas fa-heart-circle-plus"></i> Donate Blood
+                </a>
+                <a href="#about-section" class="nav-link" data-section="about-section">
+                    <i class="fas fa-info-circle"></i> About
+                </a>
+                <a href="#" class="nav-link" id="nav-ai-assist">
+                    <i class="fas fa-robot"></i> AI Assistant
+                </a>
+            </div>
+            <div class="nav-actions">
+                <button class="nav-action-link" id="btn-login-trigger">Login</button>
+                <button class="btn btn-primary btn-sm" id="btn-register-trigger">Register</button>
+                <button class="btn-emergency" id="btn-emergency">
+                    <i class="fas fa-phone-alt"></i> Emergency
+                </button>
+                <button class="nav-toggle" id="nav-toggle">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ═══════════════════ HERO SECTION ═══════════════════ -->
+    <section id="hero" class="hero-section">
+        <div class="hero-bg">
+            <div class="hero-bg-accent-circle"></div>
+            <div class="hero-bg-accent-circle-2"></div>
+        </div>
+        <div class="hero-container container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <i class="fas fa-shield-heart text-rose"></i> AI-Powered Emergency Network
+                </div>
+                <h1 class="hero-title">
+                    Find Blood.<br>
+                    <span class="gradient-text">Save Time. Save Lives.</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Quickly find available blood units, nearby blood banks, and hospitals when every second matters.
+                    Guided by <strong>Gemma AI</strong>.
+                </p>
+                <div class="hero-actions">
+                    <a href="#search-section" class="btn btn-primary btn-lg" id="hero-search-btn">
+                        <i class="fas fa-search-location"></i> Find Blood Now
+                    </a>
+                    <a href="#hospitals-section" class="btn btn-outline btn-lg" id="hero-hospitals-btn">
+                        <i class="fas fa-hospital-user"></i> Find Nearby Hospitals
+                    </a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-number" data-target="1250">0</span>
+                        <span class="stat-label">Hospitals Directory</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" data-target="580">0</span>
+                        <span class="stat-label">Blood Banks Network</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" data-target="45000">0</span>
+                        <span class="stat-label">Emergency Responses</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" data-target="120">0</span>
+                        <span class="stat-label">Cities Covered</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="hero-card-floating">
+                    <div class="card-float-icon bg-rose-light text-rose">
+                        <i class="fas fa-tint"></i>
+                    </div>
+                    <div>
+                        <h4>Universal Donor</h4>
+                        <p>O- blood units are in urgent demand</p>
+                    </div>
+                </div>
+                <div class="hero-card-floating-2">
+                    <div class="card-float-icon bg-blue-light text-cyan">
+                        <i class="fas fa-heart-pulse"></i>
+                    </div>
+                    <div>
+                        <h4>Gemma AI Online</h4>
+                        <p>Ask anything about blood donation</p>
+                    </div>
+                </div>
+                <div class="visual-circle-ring">
+                    <img src="assets/hero_banner.png" alt="RaktSetu Emergency Visual" class="hero-visual-img"
+                        onerror="this.src='https://images.unsplash.com/photo-1579684389782-64d84b5e905d?auto=format&fit=crop&w=600&q=80'">
+                </div>
+            </div>
+        </div>
+        <div class="hero-scroll-indicator">
+            <div class="scroll-mouse">
+                <div class="scroll-wheel"></div>
+            </div>
+            <span>Scroll to explore</span>
+        </div>
+    </section>
+
+    <!-- ═══════════════════ SEARCH SECTION ═══════════════════ -->
+    <section id="search-section" class="section search-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge"><i class="fas fa-tint"></i> Quick Search</span>
+                <h2 class="section-title">Find Blood <span class="gradient-text">Near You</span></h2>
+                <p class="section-desc">Select your desired blood group and provide your location to check real-time
+                    availability in nearby facilities.</p>
+            </div>
+
+            <div class="search-card-new container-small">
+                <form id="blood-search-form" class="search-form-new">
+                    <div class="search-field-row">
+                        <!-- Blood Group Buttons Grid -->
+                        <div class="search-group-wrapper">
+                            <label class="search-label"><i class="fas fa-tint"></i> Select Blood Group</label>
+                            <div class="blood-group-selector-grid">
+                                <button type="button" class="blood-btn-card" data-value="A+">A+</button>
+                                <button type="button" class="blood-btn-card" data-value="A-">A-</button>
+                                <button type="button" class="blood-btn-card" data-value="B+">B+</button>
+                                <button type="button" class="blood-btn-card" data-value="B-">B-</button>
+                                <button type="button" class="blood-btn-card" data-value="AB+">AB+</button>
+                                <button type="button" class="blood-btn-card" data-value="AB-">AB-</button>
+                                <button type="button" class="blood-btn-card" data-value="O+">O+</button>
+                                <button type="button" class="blood-btn-card" data-value="O-">O-</button>
+                            </div>
+                            <input type="hidden" id="blood-group" value="" required>
+                        </div>
+                    </div>
+
+                    <div class="search-inputs-grid">
+                        <!-- Location input -->
+                        <div class="search-field-col">
+                            <label for="location-input" class="search-label"><i class="fas fa-map-marker-alt"></i>
+                                Location</label>
+                            <div class="location-input-wrap-new">
+                                <i class="fas fa-location-arrow input-prefix-icon"></i>
+                                <input type="text" id="location-input" placeholder="Enter city, area, or PIN code..."
+                                    required>
+                                <button type="button" class="btn-locate-new" id="btn-locate"
+                                    title="Use current location">
+                                    <i class="fas fa-crosshairs"></i> Use My Current Location
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Radius selection -->
+                        <div class="search-field-col-short">
+                            <label for="search-radius" class="search-label"><i class="fas fa-expand-arrows-alt"></i>
+                                Search Radius</label>
+                            <select id="search-radius" class="radius-select-new">
+                                <option value="5">5 km</option>
+                                <option value="10" selected>10 km</option>
+                                <option value="25">25 km</option>
+                                <option value="50">50 km</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="search-action-wrap">
+                        <button type="submit" class="btn btn-primary btn-lg btn-search-wide" id="search-submit-btn">
+                            <i class="fas fa-search"></i> Search Available Blood
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Search Results: Dual Pane Layout (Left Results list, Right Sticky Map) -->
+            <div id="search-results" class="search-results hidden">
+                <div class="results-layout-wrapper">
+                    <!-- Left Result Cards List and filters -->
+                    <div class="results-left-pane">
+                        <div class="results-pane-header">
+                            <h3 id="results-title">Search Results</h3>
+                            <div class="results-filters-bar">
+                                <button type="button" class="filter-btn active" data-filter="all">All
+                                    Facilities</button>
+                                <button type="button" class="filter-btn" data-filter="blood-bank">Blood Banks</button>
+                                <button type="button" class="filter-btn" data-filter="hospital">Hospitals</button>
+                            </div>
+                        </div>
+                        <div id="results-grid" class="results-grid-vertical">
+                            <!-- Populated dynamically by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Right Sticky Map Interface -->
+                    <div class="results-right-pane">
+                        <div class="results-map-sticky-container">
+                            <div class="map-loading-indicator hidden">
+                                <i class="fas fa-circle-notch fa-spin"></i> Loading map coordinates...
+                            </div>
+                            <div id="results-map" class="results-map-render"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════ HOSPITALS SECTION ═══════════════════ -->
+    <section id="hospitals-section" class="section hospitals-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge"><i class="fas fa-hospital"></i> Hospital Directory</span>
+                <h2 class="section-title">Registered <span class="gradient-text">Hospitals & Blood Banks</span></h2>
+                <p class="section-desc">Browse our comprehensive directory of government and private hospitals and
+                    registered blood banks.</p>
+            </div>
+
+            <div class="hospital-filters glass-card">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label>Type</label>
+                        <select id="hospital-type-filter">
+                            <option value="all">All Types</option>
+                            <option value="government">Government</option>
+                            <option value="private">Private</option>
+                            <option value="blood-bank">Blood Bank</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>City</label>
+                        <select id="hospital-city-filter">
+                            <option value="all">All Cities</option>
+                            <option value="delhi">Delhi</option>
+                            <option value="mumbai">Mumbai</option>
+                            <option value="bangalore">Bangalore</option>
+                            <option value="chennai">Chennai</option>
+                            <option value="kolkata">Kolkata</option>
+                            <option value="hyderabad">Hyderabad</option>
+                            <option value="pune">Pune</option>
+                            <option value="ahmedabad">Ahmedabad</option>
+                        </select>
+                    </div>
+                    <div class="filter-group search-filter">
+                        <label>Search</label>
+                        <input type="text" id="hospital-search-input" placeholder="Search hospitals...">
+                    </div>
+                </div>
+            </div>
+
+            <div id="hospitals-grid" class="hospitals-grid">
+                <!-- Hospital cards populated by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════ REGISTER SECTION ═══════════════════ -->
+    <section id="register-section" class="section register-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge"><i class="fas fa-plus-circle"></i> Registration</span>
+                <h2 class="section-title">Register Your <span class="gradient-text">Hospital or Blood Bank</span></h2>
+                <p class="section-desc">Join our network of healthcare providers. Register your facility and help save
+                    lives by keeping blood availability updated.</p>
+            </div>
+
+            <div class="register-tabs">
+                <button class="tab-btn active" data-tab="hospital-reg">
+                    <i class="fas fa-hospital"></i> Hospital Registration
+                </button>
+                <button class="tab-btn" data-tab="bloodbank-reg">
+                    <i class="fas fa-tint"></i> Blood Bank Registration
+                </button>
+                <button class="tab-btn" data-tab="inventory-update">
+                    <i class="fas fa-boxes-stacked"></i> Update Inventory
+                </button>
+            </div>
+
+            <!-- Hospital Registration Form -->
+            <div id="hospital-reg" class="tab-content active">
+                <div class="register-card glass-card">
+                    <form id="hospital-register-form" class="register-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="hosp-name"><i class="fas fa-hospital"></i> Hospital Name</label>
+                                <input type="text" id="hosp-name" placeholder="Enter hospital name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="hosp-type"><i class="fas fa-building"></i> Type</label>
+                                <select id="hosp-type" required>
+                                    <option value="">Select Type</option>
+                                    <option value="government">Government</option>
+                                    <option value="private">Private</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="hosp-city"><i class="fas fa-city"></i> City</label>
+                                <input type="text" id="hosp-city" placeholder="City" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="hosp-address"><i class="fas fa-map-marker-alt"></i> Full Address</label>
+                                <input type="text" id="hosp-address" placeholder="Complete address" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="hosp-phone"><i class="fas fa-phone"></i> Contact Number</label>
+                                <input type="tel" id="hosp-phone" placeholder="+91 XXXXX XXXXX" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="hosp-email"><i class="fas fa-envelope"></i> Email</label>
+                                <input type="email" id="hosp-email" placeholder="hospital@email.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="hosp-hours"><i class="fas fa-clock"></i> Operating Hours</label>
+                                <input type="text" id="hosp-hours" placeholder="e.g., 24/7 or 8AM - 10PM">
+                            </div>
+                            <div class="form-group">
+                                <label for="hosp-license"><i class="fas fa-id-card"></i> License Number</label>
+                                <input type="text" id="hosp-license" placeholder="Medical license number" required>
+                            </div>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="hosp-services"><i class="fas fa-stethoscope"></i> Services Available</label>
+                            <textarea id="hosp-services" rows="3"
+                                placeholder="List your services (Blood Bank, ICU, Emergency, etc.)"></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-paper-plane"></i> Submit Registration
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Blood Bank Registration Form -->
+            <div id="bloodbank-reg" class="tab-content">
+                <div class="register-card glass-card">
+                    <form id="bloodbank-register-form" class="register-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="bb-name"><i class="fas fa-tint"></i> Blood Bank Name</label>
+                                <input type="text" id="bb-name" placeholder="Enter blood bank name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="bb-affiliated"><i class="fas fa-link"></i> Affiliated Hospital</label>
+                                <input type="text" id="bb-affiliated" placeholder="If affiliated to a hospital">
+                            </div>
+                            <div class="form-group">
+                                <label for="bb-city"><i class="fas fa-city"></i> City</label>
+                                <input type="text" id="bb-city" placeholder="City" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="bb-address"><i class="fas fa-map-marker-alt"></i> Full Address</label>
+                                <input type="text" id="bb-address" placeholder="Complete address" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="bb-phone"><i class="fas fa-phone"></i> Contact Number</label>
+                                <input type="tel" id="bb-phone" placeholder="+91 XXXXX XXXXX" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="bb-email"><i class="fas fa-envelope"></i> Email</label>
+                                <input type="email" id="bb-email" placeholder="bloodbank@email.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="bb-hours"><i class="fas fa-clock"></i> Operating Hours</label>
+                                <input type="text" id="bb-hours" placeholder="e.g., 24/7 or 8AM - 8PM">
+                            </div>
+                            <div class="form-group">
+                                <label for="bb-license"><i class="fas fa-id-card"></i> License Number</label>
+                                <input type="text" id="bb-license" placeholder="Blood bank license number" required>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-paper-plane"></i> Register Blood Bank
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Inventory Update Form -->
+            <div id="inventory-update" class="tab-content">
+                <div class="register-card glass-card">
+                    <form id="inventory-update-form" class="register-form">
+                        <div class="form-group">
+                            <label for="inv-facility"><i class="fas fa-hospital"></i> Select Facility</label>
+                            <select id="inv-facility" required>
+                                <option value="">Choose your facility</option>
+                                <option value="1">AIIMS Blood Bank - Delhi</option>
+                                <option value="2">Red Cross Blood Bank - Mumbai</option>
+                                <option value="3">Apollo Hospital Blood Bank - Chennai</option>
+                                <option value="4">Rotary Blood Bank - Delhi</option>
+                                <option value="5">Fortis Blood Bank - Bangalore</option>
+                            </select>
+                        </div>
+                        <div class="inventory-grid">
+                            <div class="inventory-item">
+                                <span class="blood-type-badge">A+</span>
+                                <input type="number" id="inv-a-pos" min="0" placeholder="Units" value="0">
+                            </div>
+                            <div class="inventory-item">
+                                <span class="blood-type-badge">A-</span>
+                                <input type="number" id="inv-a-neg" min="0" placeholder="Units" value="0">
+                            </div>
+                            <div class="inventory-item">
+                                <span class="blood-type-badge">B+</span>
+                                <input type="number" id="inv-b-pos" min="0" placeholder="Units" value="0">
+                            </div>
+                            <div class="inventory-item">
+                                <span class="blood-type-badge">B-</span>
+                                <input type="number" id="inv-b-neg" min="0" placeholder="Units" value="0">
+                            </div>
+                            <div class="inventory-item">
+                                <span class="blood-type-badge">AB+</span>
+                                <input type="number" id="inv-ab-pos" min="0" placeholder="Units" value="0">
+                            </div>
+                            <div class="inventory-item">
+                                <span class="blood-type-badge">AB-</span>
+                                <input type="number" id="inv-ab-neg" min="0" placeholder="Units" value="0">
+                            </div>
+                            <div class="inventory-item">
+                                <span class="blood-type-badge">O+</span>
+                                <input type="number" id="inv-o-pos" min="0" placeholder="Units" value="0">
+                            </div>
+                            <div class="inventory-item">
+                                <span class="blood-type-badge">O-</span>
+                                <input type="number" id="inv-o-neg" min="0" placeholder="Units" value="0">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inv-notes"><i class="fas fa-sticky-note"></i> Notes</label>
+                            <textarea id="inv-notes" rows="2"
+                                placeholder="Any additional notes about inventory changes..."></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-sync-alt"></i> Update Inventory
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════ ABOUT SECTION ═══════════════════ -->
+    <section id="about-section" class="section about-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge"><i class="fas fa-heart-pulse"></i> About RaktSetu</span>
+                <h2 class="section-title">Saving Lives Through <span class="gradient-text">Technology</span></h2>
+                <p class="section-desc">Our mission is to bridge the gap between blood donors, blood banks, and patients
+                    in need.</p>
+            </div>
+
+            <div class="about-grid">
+                <div class="about-card glass-card">
+                    <div class="about-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3>Real-Time Search</h3>
+                    <p>Instantly find blood availability across hundreds of registered blood banks and hospitals in
+                        real-time.</p>
+                </div>
+                <div class="about-card glass-card">
+                    <div class="about-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3>Gemma AI Assistant</h3>
+                    <p>Our intelligent AI assistant understands natural language queries and guides you through the
+                        search process effortlessly.</p>
+                </div>
+                <div class="about-card glass-card">
+                    <div class="about-icon">
+                        <i class="fas fa-location-dot"></i>
+                    </div>
+                    <h3>Location-Based</h3>
+                    <p>Get results sorted by proximity to your location. Find the nearest hospital or blood bank in
+                        seconds.</p>
+                </div>
+                <div class="about-card glass-card">
+                    <div class="about-icon">
+                        <i class="fas fa-shield-halved"></i>
+                    </div>
+                    <h3>Verified & Secure</h3>
+                    <p>All registered hospitals and blood banks are verified. Your data is protected with
+                        enterprise-grade security.</p>
+                </div>
+                <div class="about-card glass-card">
+                    <div class="about-icon">
+                        <i class="fas fa-language"></i>
+                    </div>
+                    <h3>Multilingual Support</h3>
+                    <p>Access the platform in multiple languages. Gemma AI understands and responds in your preferred
+                        language.</p>
+                </div>
+                <div class="about-card glass-card">
+                    <div class="about-icon">
+                        <i class="fas fa-phone-volume"></i>
+                    </div>
+                    <h3>Emergency Support</h3>
+                    <p>One-click emergency contact access with step-by-step guidance during critical situations.</p>
+                </div>
+            </div>
+
+            <!-- Blood Group Info -->
+            <div class="blood-info-section">
+                <h3 class="blood-info-title"><i class="fas fa-droplet"></i> Blood Group Compatibility Chart</h3>
+                <div class="compatibility-table-wrap glass-card">
+                    <table class="compatibility-table">
+                        <thead>
+                            <tr>
+                                <th>Blood Group</th>
+                                <th>Can Donate To</th>
+                                <th>Can Receive From</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="blood-tag">A+</span></td>
+                                <td>A+, AB+</td>
+                                <td>A+, A-, O+, O-</td>
+                            </tr>
+                            <tr>
+                                <td><span class="blood-tag">A-</span></td>
+                                <td>A+, A-, AB+, AB-</td>
+                                <td>A-, O-</td>
+                            </tr>
+                            <tr>
+                                <td><span class="blood-tag">B+</span></td>
+                                <td>B+, AB+</td>
+                                <td>B+, B-, O+, O-</td>
+                            </tr>
+                            <tr>
+                                <td><span class="blood-tag">B-</span></td>
+                                <td>B+, B-, AB+, AB-</td>
+                                <td>B-, O-</td>
+                            </tr>
+                            <tr>
+                                <td><span class="blood-tag">AB+</span></td>
+                                <td>AB+</td>
+                                <td>All Blood Groups</td>
+                            </tr>
+                            <tr>
+                                <td><span class="blood-tag">AB-</span></td>
+                                <td>AB+, AB-</td>
+                                <td>A-, B-, AB-, O-</td>
+                            </tr>
+                            <tr>
+                                <td><span class="blood-tag">O+</span></td>
+                                <td>A+, B+, AB+, O+</td>
+                                <td>O+, O-</td>
+                            </tr>
+                            <tr>
+                                <td><span class="blood-tag o-neg">O-</span></td>
+                                <td>All Blood Groups</td>
+                                <td>O-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════ EMERGENCY MODAL ═══════════════════ -->
+    <div id="emergency-modal" class="modal-overlay hidden">
+        <div class="modal emergency-modal glass-card">
+            <button class="modal-close" id="modal-close-emergency">&times;</button>
+            <div class="emergency-header">
+                <div class="emergency-pulse"></div>
+                <i class="fas fa-phone-alt"></i>
+                <h2>Emergency Contacts</h2>
+            </div>
+            <div class="emergency-contacts">
+                <a href="tel:102" class="emergency-card">
+                    <i class="fas fa-ambulance"></i>
+                    <span class="ec-number">102</span>
+                    <span class="ec-label">Ambulance</span>
+                </a>
+                <a href="tel:108" class="emergency-card">
+                    <i class="fas fa-truck-medical"></i>
+                    <span class="ec-number">108</span>
+                    <span class="ec-label">Emergency Medical</span>
+                </a>
+                <a href="tel:112" class="emergency-card">
+                    <i class="fas fa-shield-halved"></i>
+                    <span class="ec-number">112</span>
+                    <span class="ec-label">National Emergency</span>
+                </a>
+                <a href="tel:1098" class="emergency-card">
+                    <i class="fas fa-hand-holding-medical"></i>
+                    <span class="ec-number">1098</span>
+                    <span class="ec-label">Blood Helpline</span>
+                </a>
+            </div>
+            <p class="emergency-note">
+                <i class="fas fa-exclamation-triangle"></i>
+                In case of a life-threatening emergency, call your local emergency services immediately.
+            </p>
+        </div>
+    </div>
+
+    <!-- ═══════════════════ SUCCESS MODAL ═══════════════════ -->
+    <div id="success-modal" class="modal-overlay hidden">
+        <div class="modal success-modal glass-card">
+            <button class="modal-close" id="modal-close-success">&times;</button>
+            <div class="success-content">
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2 id="success-title">Registration Successful!</h2>
+                <p id="success-message">Your facility has been registered. Our team will review and verify your details
+                    within 24-48 hours.</p>
+                <button class="btn btn-primary" id="success-ok-btn">Got it!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════ GEMMA AI CHATBOT ═══════════════════ -->
+    <div id="chatbot-toggle" class="chatbot-toggle">
+        <div class="chatbot-toggle-pulse"></div>
+        <img src="assets/ai_avatar.png" alt="Gemma AI" class="chatbot-toggle-img">
+        <span class="chatbot-badge">AI</span>
+    </div>
+
+    <div id="chatbot-panel" class="chatbot-panel hidden">
+        <div class="chatbot-header">
+            <div class="chatbot-header-info">
+                <img src="assets/ai_avatar.png" alt="Gemma AI" class="chatbot-avatar">
+                <div>
+                    <h3>Gemma AI <span class="ai-badge">AI</span></h3>
+                    <span class="chatbot-status"><span class="status-dot"></span> Online</span>
+                </div>
+            </div>
+            <div class="chatbot-header-actions">
+                <button class="chatbot-btn" id="chatbot-clear" title="Clear chat">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+                <button class="chatbot-btn" id="chatbot-minimize" title="Minimize">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </div>
+        </div>
+        <div class="chatbot-messages" id="chatbot-messages">
+            <div class="chat-message bot">
+                <img src="assets/ai_avatar.png" alt="Gemma AI" class="chat-avatar">
+                <div class="chat-bubble">
+                    <p>Hello! 👋 I'm <strong>Gemma AI</strong>, your AI healthcare assistant.</p>
+                    <p>I can help you with:</p>
+                    <ul>
+                        <li>🩸 Finding blood availability near you</li>
+                        <li>🏥 Locating nearby hospitals</li>
+                        <li>❓ Blood donation FAQs</li>
+                        <li>🚨 Emergency guidance</li>
+                        <li>🌐 Multilingual support</li>
+                    </ul>
+                    <p>How can I assist you today?</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="chatbot-input-area">
+            <div class="chatbot-input-wrap">
+                <input type="text" id="chatbot-input" placeholder="Ask Gemma anything about healthcare..."
+                    autocomplete="off">
+                <button id="chatbot-send" class="chatbot-send-btn" title="Send message">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════ FOOTER ═══════════════════ -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <img src="assets/logo_icon.png" alt="RaktSetu">
+                        <span>Rakt<span class="accent">Setu</span></span>
+                    </div>
+                    <p>AI-powered healthcare platform connecting patients with blood banks and hospitals. Every drop
+                        counts, every second matters.</p>
+                    <div class="footer-socials">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <a href="#hero">Home</a>
+                    <a href="#search-section">Find Blood</a>
+                    <a href="#hospitals-section">Find Hospitals</a>
+                    <a href="#register-section">Donate Blood</a>
+                    <a href="#about-section">About Us</a>
+                </div>
+                <div class="footer-links">
+                    <h4>Resources</h4>
+                    <a href="#">Blood Donation FAQs</a>
+                    <a href="#">Eligibility Criteria</a>
+                    <a href="#">Donation Process</a>
+                    <a href="#">Health Tips</a>
+                    <a href="#">API Documentation</a>
+                </div>
+                <div class="footer-contact">
+                    <h4>Contact Us</h4>
+                    <p><i class="fas fa-envelope"></i> support@raktsetu.medical</p>
+                    <p><i class="fas fa-phone"></i> +91 1800-XXX-XXXX</p>
+                    <p><i class="fas fa-map-marker-alt"></i> New Delhi, India</p>
+                    <p><i class="fas fa-clock"></i> 24/7 Support Available</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 RaktSetu Healthcare. All rights reserved. Powered by <strong>Gemma AI</strong>.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ═══════════════════ SCRIPTS ═══════════════════ -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="data.js?v=2"></script>
+    <script src="app.js?v=2"></script>
+</body>
+
+</html>
