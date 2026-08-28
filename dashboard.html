@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RaktSetu – Dashboard</title>
+    <meta name="description"
+        content="Your personal RaktSetu healthcare dashboard. Manage blood requests, track donations, and view nearby alerts.">
+    <link rel="icon" href="assets/logo_icon.png" type="image/png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+
+<body>
+
+    <!-- ─── SIDEBAR ─── -->
+    <aside class="dash-sidebar" id="dash-sidebar">
+        <div class="dash-brand">
+            <i class="fas fa-droplet dash-brand-icon"></i>
+            <span>Rakt<span class="accent">Setu</span></span>
+        </div>
+
+        <nav class="dash-nav">
+            <a href="#" class="dash-nav-item active" data-page="overview">
+                <i class="fas fa-th-large"></i> Overview
+            </a>
+            <a href="#" class="dash-nav-item" data-page="search">
+                <i class="fas fa-search"></i> Find Blood
+            </a>
+            <a href="#" class="dash-nav-item" data-page="requests">
+                <i class="fas fa-bell"></i> My Requests
+                <span class="dash-badge">3</span>
+            </a>
+            <a href="#" class="dash-nav-item" data-page="hospitals">
+                <i class="fas fa-hospital"></i> Hospitals
+            </a>
+            <a href="#" class="dash-nav-item" data-page="history">
+                <i class="fas fa-history"></i> Donation History
+            </a>
+            <a href="#" class="dash-nav-item" data-page="settings">
+                <i class="fas fa-cog"></i> Settings
+            </a>
+        </nav>
+
+        <div class="dash-sidebar-footer">
+            <div class="dash-user-mini">
+                <div class="dash-avatar-sm"><i class="fas fa-user"></i></div>
+                <div>
+                    <div class="dash-user-name" id="dash-username">Welcome User</div>
+                    <div class="dash-user-role">Member</div>
+                </div>
+            </div>
+            <a href="index.html" class="dash-logout-btn" title="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
+        </div>
+    </aside>
+
+    <!-- ─── MAIN CONTENT ─── -->
+    <main class="dash-main">
+
+        <!-- TOP BAR -->
+        <header class="dash-topbar">
+            <div class="dash-topbar-left">
+                <button class="dash-sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar menu"
+                    aria-expanded="false">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div>
+                    <h1 class="dash-page-title">Dashboard Overview</h1>
+                    <p class="dash-page-subtitle">Welcome back! Here's what's happening today.</p>
+                </div>
+            </div>
+            <div class="dash-topbar-right">
+                <div class="dash-search-wrap">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search hospitals, blood groups…">
+                </div>
+                <button class="dash-notif-btn" aria-label="Notifications"><i class="fas fa-bell"></i><span
+                        class="notif-dot"></span></button>
+                <div class="dash-user-pill">
+                    <div class="dash-avatar"><i class="fas fa-user"></i></div>
+                    <span id="dash-user-pill-name">User</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- KPI STAT CARDS -->
+        <section class="dash-stats-row">
+            <div class="dash-stat-card">
+                <div class="dash-stat-icon rose"><i class="fas fa-tint"></i></div>
+                <div class="dash-stat-info">
+                    <span class="dash-stat-val">O+</span>
+                    <span class="dash-stat-label">Your Blood Type</span>
+                </div>
+            </div>
+            <div class="dash-stat-card">
+                <div class="dash-stat-icon blue"><i class="fas fa-hospital"></i></div>
+                <div class="dash-stat-info">
+                    <span class="dash-stat-val" id="kpi-hospitals">48</span>
+                    <span class="dash-stat-label">Hospitals Nearby</span>
+                </div>
+            </div>
+            <div class="dash-stat-card">
+                <div class="dash-stat-icon green"><i class="fas fa-check-circle"></i></div>
+                <div class="dash-stat-info">
+                    <span class="dash-stat-val" id="kpi-donations">3</span>
+                    <span class="dash-stat-label">Donations Made</span>
+                </div>
+            </div>
+            <div class="dash-stat-card">
+                <div class="dash-stat-icon amber"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="dash-stat-info">
+                    <span class="dash-stat-val" id="kpi-alerts">2</span>
+                    <span class="dash-stat-label">Active Alerts</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- MAIN GRID -->
+        <div class="dash-content-grid">
+
+            <!-- BLOOD AVAILABILITY PANEL -->
+            <div class="dash-panel dash-availability">
+                <div class="dash-panel-header">
+                    <h3><i class="fas fa-tint"></i> Nearby Blood Availability</h3>
+                    <a href="index.html#search-section" class="dash-link-btn">Search More <i
+                            class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="availability-grid">
+                    <div class="avail-blood-card high"><span class="bg-label">A+</span><span class="bg-units">24
+                            units</span><span class="bg-status">Available</span></div>
+                    <div class="avail-blood-card high"><span class="bg-label">O+</span><span class="bg-units">18
+                            units</span><span class="bg-status">Available</span></div>
+                    <div class="avail-blood-card medium"><span class="bg-label">B+</span><span class="bg-units">7
+                            units</span><span class="bg-status">Low Stock</span></div>
+                    <div class="avail-blood-card low"><span class="bg-label">AB-</span><span class="bg-units">1
+                            unit</span><span class="bg-status">Critical</span></div>
+                    <div class="avail-blood-card high"><span class="bg-label">A-</span><span class="bg-units">12
+                            units</span><span class="bg-status">Available</span></div>
+                    <div class="avail-blood-card medium"><span class="bg-label">B-</span><span class="bg-units">5
+                            units</span><span class="bg-status">Low Stock</span></div>
+                    <div class="avail-blood-card high"><span class="bg-label">O-</span><span class="bg-units">9
+                            units</span><span class="bg-status">Available</span></div>
+                    <div class="avail-blood-card low"><span class="bg-label">AB+</span><span class="bg-units">0
+                            units</span><span class="bg-status">Out of Stock</span></div>
+                </div>
+            </div>
+
+            <!-- QUICK ACTIONS -->
+            <div class="dash-panel dash-quick-actions">
+                <div class="dash-panel-header">
+                    <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+                </div>
+                <div class="qa-grid">
+                    <a href="index.html#search-section" class="qa-card">
+                        <div class="qa-icon rose"><i class="fas fa-search"></i></div>
+                        <span>Find Blood</span>
+                    </a>
+                    <a href="index.html#hospitals-section" class="qa-card">
+                        <div class="qa-icon blue"><i class="fas fa-hospital"></i></div>
+                        <span>Hospitals</span>
+                    </a>
+                    <a href="index.html#register-section" class="qa-card">
+                        <div class="qa-icon green"><i class="fas fa-plus-circle"></i></div>
+                        <span>Register</span>
+                    </a>
+                    <div class="qa-card" id="qa-emergency">
+                        <div class="qa-icon red"><i class="fas fa-phone-alt"></i></div>
+                        <span>Emergency 104</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RECENT ALERTS -->
+            <div class="dash-panel dash-alerts-panel">
+                <div class="dash-panel-header">
+                    <h3><i class="fas fa-bell"></i> Urgent Blood Requests Near You</h3>
+                    <span class="dash-badge-sm">LIVE</span>
+                </div>
+                <div class="alert-list">
+                    <div class="alert-item critical">
+                        <div class="alert-bg-badge">AB-</div>
+                        <div class="alert-detail">
+                            <strong>AB- Urgently needed</strong>
+                            <span>AIIMS Hospital, Delhi &bull; 2.3 km away</span>
+                            <span class="alert-time"><i class="fas fa-clock"></i> 12 minutes ago</span>
+                        </div>
+                        <button class="alert-respond-btn"
+                            aria-label="Respond to AB- emergency request at AIIMS Hospital">Respond</button>
+                    </div>
+                    <div class="alert-item warning">
+                        <div class="alert-bg-badge">O-</div>
+                        <div class="alert-detail">
+                            <strong>O- low stock</strong>
+                            <span>Red Cross Blood Bank &bull; 4.7 km away</span>
+                            <span class="alert-time"><i class="fas fa-clock"></i> 38 minutes ago</span>
+                        </div>
+                        <button class="alert-respond-btn"
+                            aria-label="Respond to O- low stock alert at Red Cross Blood Bank">Respond</button>
+                    </div>
+                    <div class="alert-item info">
+                        <div class="alert-bg-badge">B+</div>
+                        <div class="alert-detail">
+                            <strong>B+ stock running low</strong>
+                            <span>Apollo Blood Bank &bull; 6.1 km away</span>
+                            <span class="alert-time"><i class="fas fa-clock"></i> 1 hour ago</span>
+                        </div>
+                        <button class="alert-respond-btn"
+                            aria-label="View B+ stock alert at Apollo Blood Bank">View</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DONATION HISTORY -->
+            <div class="dash-panel dash-history-panel">
+                <div class="dash-panel-header">
+                    <h3><i class="fas fa-history"></i> Donation Timeline</h3>
+                </div>
+                <div class="history-timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-dot rose"></div>
+                        <div class="timeline-body">
+                            <strong>Blood Donated – O+</strong>
+                            <span>AIIMS Blood Bank, Delhi</span>
+                            <span class="timeline-date">15 Aug 2026</span>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot blue"></div>
+                        <div class="timeline-body">
+                            <strong>Donation Camp Registered</strong>
+                            <span>ITO, New Delhi Camp</span>
+                            <span class="timeline-date">30 Jun 2026</span>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot green"></div>
+                        <div class="timeline-body">
+                            <strong>Blood Donated – O+</strong>
+                            <span>Red Cross, Delhi</span>
+                            <span class="timeline-date">12 Feb 2026</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // Show username from sessionStorage
+        const user = sessionStorage.getItem('raktsetuUser') || 'User';
+        document.getElementById('dash-username').textContent = user;
+        document.getElementById('dash-user-pill-name').textContent = user;
+
+        // Sidebar toggle (mobile)
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const dashSidebar = document.getElementById('dash-sidebar');
+        sidebarToggle.addEventListener('click', () => {
+            const isOpen = dashSidebar.classList.toggle('open');
+            sidebarToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+
+        // Emergency call
+        document.getElementById('qa-emergency').addEventListener('click', () => {
+            window.location.href = 'tel:104';
+        });
+    </script>
+</body>
+
+</html>

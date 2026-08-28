@@ -59,17 +59,18 @@
                 <a href="#about-section" class="nav-link" data-section="about-section">
                     <i class="fas fa-info-circle"></i> About
                 </a>
-                <a href="#" class="nav-link" id="nav-ai-assist">
+                <a href="#" class="nav-link" id="nav-ai-assist" role="button" aria-haspopup="dialog"
+                    aria-expanded="false">
                     <i class="fas fa-robot"></i> AI Assistant
                 </a>
             </div>
             <div class="nav-actions">
-                <button class="nav-action-link" id="btn-login-trigger">Login</button>
-                <button class="btn btn-primary btn-sm" id="btn-register-trigger">Register</button>
-                <button class="btn-emergency" id="btn-emergency">
+                <button class="btn btn-primary btn-sm" id="btn-register-trigger" type="button">Register</button>
+                <button class="btn-emergency" id="btn-emergency" type="button">
                     <i class="fas fa-phone-alt"></i> Emergency
                 </button>
-                <button class="nav-toggle" id="nav-toggle">
+                <button class="nav-toggle" id="nav-toggle" type="button" aria-label="Toggle navigation menu"
+                    aria-expanded="false">
                     <span></span><span></span><span></span>
                 </button>
             </div>
@@ -78,144 +79,201 @@
 
     <!-- ═══════════════════ HERO SECTION ═══════════════════ -->
     <section id="hero" class="hero-section">
-        <div class="hero-bg">
-            <div class="hero-bg-accent-circle"></div>
-            <div class="hero-bg-accent-circle-2"></div>
-        </div>
         <div class="hero-container container">
+            <!-- Left: Text Content -->
             <div class="hero-content">
                 <div class="hero-badge">
-                    <i class="fas fa-shield-heart text-rose"></i> AI-Powered Emergency Network
+                    <i class="fas fa-map-marker-alt"></i> AI-POWERED EMERGENCY NETWORK
                 </div>
                 <h1 class="hero-title">
-                    Find Blood.<br>
-                    <span class="gradient-text">Save Time. Save Lives.</span>
+                    Find the Blood You Need,<br>
+                    <span class="hero-title-accent">When Every Second Matters.</span>
                 </h1>
                 <p class="hero-subtitle">
-                    Quickly find available blood units, nearby blood banks, and hospitals when every second matters.
-                    Guided by <strong>Gemma AI</strong>.
+                    Instantly connect with verified blood banks, hospitals, and willing donors in your area. Driven by
+                    real-time data and AI-assisted routing to save lives.
                 </p>
                 <div class="hero-actions">
                     <a href="#search-section" class="btn btn-primary btn-lg" id="hero-search-btn">
-                        <i class="fas fa-search-location"></i> Find Blood Now
+                        <i class="fas fa-search"></i> Search Available Blood
                     </a>
-                    <a href="#hospitals-section" class="btn btn-outline btn-lg" id="hero-hospitals-btn">
-                        <i class="fas fa-hospital-user"></i> Find Nearby Hospitals
+                    <a href="#hospitals-section" class="btn btn-outline-dark btn-lg" id="hero-hospitals-btn">
+                        <i class="fas fa-hospital"></i> Find Nearby Hospitals
                     </a>
-                </div>
-                <div class="hero-stats">
-                    <div class="stat-item">
-                        <span class="stat-number" data-target="1250">0</span>
-                        <span class="stat-label">Hospitals Directory</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number" data-target="580">0</span>
-                        <span class="stat-label">Blood Banks Network</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number" data-target="45000">0</span>
-                        <span class="stat-label">Emergency Responses</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number" data-target="120">0</span>
-                        <span class="stat-label">Cities Covered</span>
-                    </div>
                 </div>
             </div>
-            <div class="hero-visual">
-                <div class="hero-card-floating">
-                    <div class="card-float-icon bg-rose-light text-rose">
-                        <i class="fas fa-tint"></i>
-                    </div>
-                    <div>
-                        <h4>Universal Donor</h4>
-                        <p>O- blood units are in urgent demand</p>
-                    </div>
+
+            <!-- Right: Quick Blood Search Card -->
+            <div class="hero-search-card">
+                <div class="hero-search-card-header">
+                    <i class="fas fa-droplet text-rose"></i>
+                    <h3>Quick Blood Search</h3>
                 </div>
-                <div class="hero-card-floating-2">
-                    <div class="card-float-icon bg-blue-light text-cyan">
-                        <i class="fas fa-heart-pulse"></i>
+                <form id="hero-quick-search-form" class="hero-quick-form">
+                    <div class="hero-quick-row">
+                        <div class="hero-quick-field">
+                            <label for="hqs-blood-group" class="hqs-label">BLOOD GROUP</label>
+                            <div class="hqs-select-wrap">
+                                <select id="hqs-blood-group" class="hqs-select">
+                                    <option value="">Select Group</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="hero-quick-field">
+                            <label for="hqs-radius" class="hqs-label">SEARCH RADIUS</label>
+                            <div class="hqs-select-wrap">
+                                <select id="hqs-radius" class="hqs-select">
+                                    <option value="5">Within 5 km</option>
+                                    <option value="10" selected>Within 10 km</option>
+                                    <option value="25">Within 25 km</option>
+                                    <option value="50">Within 50 km</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <h4>Gemma AI Online</h4>
-                        <p>Ask anything about blood donation</p>
+                    <div class="hero-quick-field full">
+                        <label for="hqs-location" class="hqs-label">LOCATION</label>
+                        <div class="hqs-location-wrap">
+                            <i class="fas fa-map-marker-alt hqs-loc-icon"></i>
+                            <input type="text" id="hqs-location" class="hqs-location-input"
+                                placeholder="Enter city or pin code">
+                            <button type="button" class="hqs-use-current" id="hqs-locate-btn"
+                                aria-label="Use current location">
+                                <i class="fas fa-crosshairs"></i> Use Current
+                            </button>
+                        </div>
                     </div>
-                </div>
-                <div class="visual-circle-ring">
-                    <img src="assets/hero_banner.png" alt="RaktSetu Emergency Visual" class="hero-visual-img"
-                        onerror="this.src='https://images.unsplash.com/photo-1579684389782-64d84b5e905d?auto=format&fit=crop&w=600&q=80'">
+                    <button type="submit" class="btn btn-primary btn-lg hqs-submit-btn">
+                        Search Available Blood <i class="fas fa-arrow-right"></i>
+                    </button>
+                </form>
+                <!-- Urgent Alert Chip -->
+                <div class="hqs-urgent-chip">
+                    <div class="hqs-urgent-badge">URGENT REQUIREMENT</div>
+                    <div class="hqs-urgent-content">
+                        <div class="hqs-urgent-icon"><i class="fas fa-droplet"></i></div>
+                        <div>
+                            <div class="hqs-urgent-type">O- Negative</div>
+                            <div class="hqs-urgent-loc">Max Hospital, New Delhi</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="hero-scroll-indicator">
-            <div class="scroll-mouse">
-                <div class="scroll-wheel"></div>
+    </section>
+
+    <!-- ═══════════════════ STATS SECTION ═══════════════════ -->
+    <section id="stats-section" class="stats-section">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-hospital"></i>
+                    </div>
+                    <div class="stat-card-number" data-target="1250">0</div>
+                    <div class="stat-card-label">REGISTERED<br>HOSPITALS</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-droplet"></i>
+                    </div>
+                    <div class="stat-card-number" data-target="580">0</div>
+                    <div class="stat-card-label">BLOOD BANKS</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-asterisk"></i>
+                    </div>
+                    <div class="stat-card-number" data-target="45000">0</div>
+                    <div class="stat-card-label">EMERGENCY<br>RESPONSES</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <div class="stat-card-number" data-target="120">0</div>
+                    <div class="stat-card-label">CITIES COVERED</div>
+                </div>
             </div>
-            <span>Scroll to explore</span>
         </div>
     </section>
 
     <!-- ═══════════════════ SEARCH SECTION ═══════════════════ -->
     <section id="search-section" class="section search-section">
         <div class="container">
-            <div class="section-header">
-                <span class="section-badge"><i class="fas fa-tint"></i> Quick Search</span>
-                <h2 class="section-title">Find Blood <span class="gradient-text">Near You</span></h2>
-                <p class="section-desc">Select your desired blood group and provide your location to check real-time
-                    availability in nearby facilities.</p>
+            <div class="section-header search-header-center">
+                <span class="section-badge"><i class="fas fa-droplet"></i> QUICK SEARCH</span>
+                <h2 class="section-title">Find Blood <span class="text-rose">Near You</span></h2>
+                <p class="section-desc max-w-2xl mx-auto">Select your desired blood group and provide your location to
+                    check real-time availability in nearby facilities.</p>
             </div>
 
             <div class="search-card-new container-small">
                 <form id="blood-search-form" class="search-form-new">
                     <div class="search-field-row">
-                        <!-- Blood Group Buttons Grid -->
                         <div class="search-group-wrapper">
-                            <label class="search-label"><i class="fas fa-tint"></i> Select Blood Group</label>
-                            <div class="blood-group-selector-grid">
-                                <button type="button" class="blood-btn-card" data-value="A+">A+</button>
-                                <button type="button" class="blood-btn-card" data-value="A-">A-</button>
-                                <button type="button" class="blood-btn-card" data-value="B+">B+</button>
-                                <button type="button" class="blood-btn-card" data-value="B-">B-</button>
-                                <button type="button" class="blood-btn-card" data-value="AB+">AB+</button>
-                                <button type="button" class="blood-btn-card" data-value="AB-">AB-</button>
-                                <button type="button" class="blood-btn-card" data-value="O+">O+</button>
-                                <button type="button" class="blood-btn-card" data-value="O-">O-</button>
+                            <label class="hqs-label"><i class="fas fa-droplet"></i> SELECT BLOOD GROUP</label>
+                            <div class="blood-group-selector-grid" role="group" aria-label="Select Blood Group">
+                                <button type="button" class="blood-btn-card" data-value="A+"
+                                    aria-pressed="false">A+</button>
+                                <button type="button" class="blood-btn-card" data-value="A-"
+                                    aria-pressed="false">A-</button>
+                                <button type="button" class="blood-btn-card" data-value="B+"
+                                    aria-pressed="false">B+</button>
+                                <button type="button" class="blood-btn-card" data-value="B-"
+                                    aria-pressed="false">B-</button>
+                                <button type="button" class="blood-btn-card" data-value="AB+"
+                                    aria-pressed="false">AB+</button>
+                                <button type="button" class="blood-btn-card" data-value="AB-"
+                                    aria-pressed="false">AB-</button>
+                                <button type="button" class="blood-btn-card" data-value="O+"
+                                    aria-pressed="false">O+</button>
+                                <button type="button" class="blood-btn-card" data-value="O-"
+                                    aria-pressed="false">O-</button>
                             </div>
                             <input type="hidden" id="blood-group" value="" required>
                         </div>
                     </div>
 
                     <div class="search-inputs-grid">
-                        <!-- Location input -->
-                        <div class="search-field-col">
-                            <label for="location-input" class="search-label"><i class="fas fa-map-marker-alt"></i>
-                                Location</label>
-                            <div class="location-input-wrap-new">
-                                <i class="fas fa-location-arrow input-prefix-icon"></i>
-                                <input type="text" id="location-input" placeholder="Enter city, area, or PIN code..."
-                                    required>
-                                <button type="button" class="btn-locate-new" id="btn-locate"
-                                    title="Use current location">
-                                    <i class="fas fa-crosshairs"></i> Use My Current Location
+                        <div class="hero-quick-field">
+                            <label for="location-input" class="hqs-label"><i class="fas fa-map-marker-alt"></i>
+                                LOCATION</label>
+                            <div class="hqs-location-wrap">
+                                <i class="fas fa-search hqs-loc-icon"></i>
+                                <input type="text" id="location-input" class="hqs-location-input"
+                                    placeholder="Enter city, area, or PIN code..." required>
+                                <button type="button" class="hqs-use-current" id="btn-locate">
+                                    <i class="fas fa-crosshairs"></i> Use Current
                                 </button>
                             </div>
                         </div>
 
-                        <!-- Radius selection -->
-                        <div class="search-field-col-short">
-                            <label for="search-radius" class="search-label"><i class="fas fa-expand-arrows-alt"></i>
-                                Search Radius</label>
-                            <select id="search-radius" class="radius-select-new">
-                                <option value="5">5 km</option>
-                                <option value="10" selected>10 km</option>
-                                <option value="25">25 km</option>
-                                <option value="50">50 km</option>
-                            </select>
+                        <div class="hero-quick-field">
+                            <label for="search-radius" class="hqs-label"><i class="fas fa-compass"></i> SEARCH
+                                RADIUS</label>
+                            <div class="hqs-select-wrap">
+                                <select id="search-radius" class="hqs-select">
+                                    <option value="5">Within 5 km</option>
+                                    <option value="10" selected>Within 10 km</option>
+                                    <option value="25">Within 25 km</option>
+                                    <option value="50">Within 50 km</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
                     <div class="search-action-wrap">
-                        <button type="submit" class="btn btn-primary btn-lg btn-search-wide" id="search-submit-btn">
+                        <button type="submit" class="btn btn-primary hqs-submit-btn"
+                            style="padding: 18px; font-size: 1.05rem;" id="search-submit-btn">
                             <i class="fas fa-search"></i> Search Available Blood
                         </button>
                     </div>
@@ -229,11 +287,14 @@
                     <div class="results-left-pane">
                         <div class="results-pane-header">
                             <h3 id="results-title">Search Results</h3>
-                            <div class="results-filters-bar">
-                                <button type="button" class="filter-btn active" data-filter="all">All
+                            <div class="results-filters-bar" role="group" aria-label="Filter results">
+                                <button type="button" class="filter-btn active" data-filter="all"
+                                    aria-pressed="true">All
                                     Facilities</button>
-                                <button type="button" class="filter-btn" data-filter="blood-bank">Blood Banks</button>
-                                <button type="button" class="filter-btn" data-filter="hospital">Hospitals</button>
+                                <button type="button" class="filter-btn" data-filter="blood-bank"
+                                    aria-pressed="false">Blood Banks</button>
+                                <button type="button" class="filter-btn" data-filter="hospital"
+                                    aria-pressed="false">Hospitals</button>
                             </div>
                         </div>
                         <div id="results-grid" class="results-grid-vertical">
@@ -258,123 +319,252 @@
     <!-- ═══════════════════ HOSPITALS SECTION ═══════════════════ -->
     <section id="hospitals-section" class="section hospitals-section">
         <div class="container">
-            <div class="section-header">
-                <span class="section-badge"><i class="fas fa-hospital"></i> Hospital Directory</span>
-                <h2 class="section-title">Registered <span class="gradient-text">Hospitals & Blood Banks</span></h2>
-                <p class="section-desc">Browse our comprehensive directory of government and private hospitals and
-                    registered blood banks.</p>
+            <div class="section-badge-center">
+                <span class="section-badge"><i class="fas fa-building"></i> HOSPITAL DIRECTORY</span>
+            </div>
+            <div class="section-header search-header-center">
+                <h2 class="section-title">Registered <span class="text-rose">Hospitals & Blood Banks</span></h2>
+                <p class="section-desc max-w-2xl mx-auto">Browse our comprehensive directory of government and private
+                    hospitals and registered blood banks.</p>
             </div>
 
-            <div class="hospital-filters glass-card">
-                <div class="filter-row">
-                    <div class="filter-group">
-                        <label>Type</label>
-                        <select id="hospital-type-filter">
-                            <option value="all">All Types</option>
-                            <option value="government">Government</option>
-                            <option value="private">Private</option>
-                            <option value="blood-bank">Blood Bank</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>City</label>
-                        <select id="hospital-city-filter">
-                            <option value="all">All Cities</option>
-                            <option value="delhi">Delhi</option>
-                            <option value="mumbai">Mumbai</option>
-                            <option value="bangalore">Bangalore</option>
-                            <option value="chennai">Chennai</option>
-                            <option value="kolkata">Kolkata</option>
-                            <option value="hyderabad">Hyderabad</option>
-                            <option value="pune">Pune</option>
-                            <option value="ahmedabad">Ahmedabad</option>
-                        </select>
-                    </div>
-                    <div class="filter-group search-filter">
-                        <label>Search</label>
-                        <input type="text" id="hospital-search-input" placeholder="Search hospitals...">
+            <div class="hospital-directory-wrapper">
+                <div class="hospital-filters">
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label for="hospital-type-filter" class="hqs-label">TYPE</label>
+                            <div class="hqs-select-wrap">
+                                <select id="hospital-type-filter" class="hqs-select">
+                                    <option value="all">All Types</option>
+                                    <option value="government">Government</option>
+                                    <option value="private">Private</option>
+                                    <option value="blood-bank">Blood Bank</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="filter-group">
+                            <label for="hospital-city-filter" class="hqs-label">CITY</label>
+                            <div class="hqs-select-wrap">
+                                <select id="hospital-city-filter" class="hqs-select">
+                                    <option value="all">All Cities</option>
+                                    <option value="delhi">Delhi</option>
+                                    <option value="mumbai">Mumbai</option>
+                                    <option value="bangalore">Bangalore</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="filter-group search-filter" style="flex: 2;">
+                            <label for="hospital-search-input" class="hqs-label">SEARCH</label>
+                            <div class="hqs-location-wrap">
+                                <i class="fas fa-search hqs-loc-icon"></i>
+                                <input type="text" id="hospital-search-input" class="hqs-location-input"
+                                    placeholder="Search hospitals by name...">
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div id="hospitals-grid" class="hospitals-grid">
-                <!-- Hospital cards populated by JS -->
+                <div id="hospitals-grid" class="hospitals-grid">
+                    <!-- Hospital cards populated by JS -->
+                </div>
             </div>
         </div>
     </section>
 
     <!-- ═══════════════════ REGISTER SECTION ═══════════════════ -->
-    <section id="register-section" class="section register-section">
+    <section id="register-section" class="section register-section" style="background:#f9fafb;">
         <div class="container">
-            <div class="section-header">
-                <span class="section-badge"><i class="fas fa-plus-circle"></i> Registration</span>
-                <h2 class="section-title">Register Your <span class="gradient-text">Hospital or Blood Bank</span></h2>
-                <p class="section-desc">Join our network of healthcare providers. Register your facility and help save
-                    lives by keeping blood availability updated.</p>
+            <div class="section-badge-center">
+                <span class="section-badge"><i class="fas fa-plus-circle"></i> REGISTRATION</span>
+            </div>
+            <div class="section-header search-header-center">
+                <h2 class="section-title">Register Your <span class="text-rose">Hospital</span> or Blood Bank</h2>
+                <p class="section-desc max-w-2xl mx-auto">Join our network of healthcare providers. Register your
+                    facility and help save lives by keeping blood availability updated.</p>
             </div>
 
-            <div class="register-tabs">
-                <button class="tab-btn active" data-tab="hospital-reg">
+            <div class="register-tabs-new" role="tablist" aria-label="Registration Options">
+                <button class="tab-btn hqs-submit-btn active" id="tab-hospital" role="tab" aria-selected="true"
+                    aria-controls="hospital-reg" style="width:auto; padding: 10px 24px" data-tab="hospital-reg">
                     <i class="fas fa-hospital"></i> Hospital Registration
                 </button>
-                <button class="tab-btn" data-tab="bloodbank-reg">
+                <button class="tab-btn btn-outline-dark" id="tab-bloodbank" role="tab" aria-selected="false"
+                    aria-controls="bloodbank-reg" style="padding: 10px 24px; border-radius: var(--radius-sm)"
+                    data-tab="bloodbank-reg">
                     <i class="fas fa-tint"></i> Blood Bank Registration
                 </button>
-                <button class="tab-btn" data-tab="inventory-update">
+                <button class="tab-btn btn-outline-dark" id="tab-inventory" role="tab" aria-selected="false"
+                    aria-controls="inventory-update" style="padding: 10px 24px; border-radius: var(--radius-sm)"
+                    data-tab="inventory-update">
                     <i class="fas fa-boxes-stacked"></i> Update Inventory
                 </button>
             </div>
 
             <!-- Hospital Registration Form -->
-            <div id="hospital-reg" class="tab-content active">
-                <div class="register-card glass-card">
-                    <form id="hospital-register-form" class="register-form">
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label for="hosp-name"><i class="fas fa-hospital"></i> Hospital Name</label>
-                                <input type="text" id="hosp-name" placeholder="Enter hospital name" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="hosp-type"><i class="fas fa-building"></i> Type</label>
-                                <select id="hosp-type" required>
-                                    <option value="">Select Type</option>
-                                    <option value="government">Government</option>
-                                    <option value="private">Private</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="hosp-city"><i class="fas fa-city"></i> City</label>
-                                <input type="text" id="hosp-city" placeholder="City" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="hosp-address"><i class="fas fa-map-marker-alt"></i> Full Address</label>
-                                <input type="text" id="hosp-address" placeholder="Complete address" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="hosp-phone"><i class="fas fa-phone"></i> Contact Number</label>
-                                <input type="tel" id="hosp-phone" placeholder="+91 XXXXX XXXXX" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="hosp-email"><i class="fas fa-envelope"></i> Email</label>
-                                <input type="email" id="hosp-email" placeholder="hospital@email.com" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="hosp-hours"><i class="fas fa-clock"></i> Operating Hours</label>
-                                <input type="text" id="hosp-hours" placeholder="e.g., 24/7 or 8AM - 10PM">
-                            </div>
-                            <div class="form-group">
-                                <label for="hosp-license"><i class="fas fa-id-card"></i> License Number</label>
-                                <input type="text" id="hosp-license" placeholder="Medical license number" required>
+            <div id="hospital-reg" class="tab-content active mx-auto" role="tabpanel" aria-labelledby="tab-hospital"
+                tabindex="0" style="max-width: 800px;">
+                <div class="hero-search-card" style="box-shadow: 0 4px 20px rgba(0,0,0,0.05); padding: 40px;">
+
+                    <!-- Progress Bar Header -->
+                    <div class="registration-progress">
+                        <div
+                            style="display:flex; justify-content:space-between; margin-bottom:12px; font-size: 0.75rem; font-weight: 700; color:var(--text-muted); letter-spacing:0.5px">
+                            <span>STEP 1 OF 6</span>
+                            <span>ORGANIZATION DETAILS</span>
+                        </div>
+                        <div class="progress-bar-track"
+                            style="height: 6px; background: #e2e8f0; border-radius: 6px; margin-bottom: 24px; overflow:hidden">
+                            <div class="progress-bar-fill"
+                                style="width: 16%; height: 100%; background: var(--accent-rose); border-radius: 6px;">
                             </div>
                         </div>
-                        <div class="form-group full-width">
-                            <label for="hosp-services"><i class="fas fa-stethoscope"></i> Services Available</label>
-                            <textarea id="hosp-services" rows="3"
+                        <div
+                            style="display:flex; justify-content:space-between; margin-bottom: 40px; text-align:center; font-size:0.65rem; font-weight:700; color:var(--text-muted)">
+                            <div style="color:var(--accent-rose)">
+                                <div
+                                    style="width:32px; height:32px; border-radius:50%; background:var(--accent-rose); color:#fff; display:flex; align-items:center; justify-content:center; margin:0 auto 8px; font-size:0.9rem">
+                                    1</div>ORGANIZATION
+                            </div>
+                            <div>
+                                <div
+                                    style="width:32px; height:32px; border-radius:50%; background:#e2e8f0; color:#64748b; display:flex; align-items:center; justify-content:center; margin:0 auto 8px; font-size:0.9rem">
+                                    2</div>CONTACT
+                            </div>
+                            <div>
+                                <div
+                                    style="width:32px; height:32px; border-radius:50%; background:#e2e8f0; color:#64748b; display:flex; align-items:center; justify-content:center; margin:0 auto 8px; font-size:0.9rem">
+                                    3</div>LOCATION
+                            </div>
+                            <div>
+                                <div
+                                    style="width:32px; height:32px; border-radius:50%; background:#e2e8f0; color:#64748b; display:flex; align-items:center; justify-content:center; margin:0 auto 8px; font-size:0.9rem">
+                                    4</div>DETAILS
+                            </div>
+                            <div>
+                                <div
+                                    style="width:32px; height:32px; border-radius:50%; background:#e2e8f0; color:#64748b; display:flex; align-items:center; justify-content:center; margin:0 auto 8px; font-size:0.9rem">
+                                    5</div>VERIFY
+                            </div>
+                            <div>
+                                <div
+                                    style="width:32px; height:32px; border-radius:50%; background:#e2e8f0; color:#64748b; display:flex; align-items:center; justify-content:center; margin:0 auto 8px; font-size:0.9rem">
+                                    6</div>SUBMIT
+                            </div>
+                        </div>
+                    </div>
+
+                    <form id="hospital-register-form" class="hero-quick-form">
+                        <div class="hero-quick-row">
+                            <div class="hero-quick-field">
+                                <label for="hosp-name" class="hqs-label text-rose"><i class="fas fa-hospital"></i>
+                                    HOSPITAL NAME</label>
+                                <input type="text" id="hosp-name" class="hqs-location-input"
+                                    style="border: 1.5px solid var(--border-color); border-radius:var(--radius-sm); padding:10px 12px; font-size:0.9rem;"
+                                    placeholder="Enter hospital name" required>
+                                <div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px">Full legal
+                                    registered name of the facility.</div>
+                            </div>
+                            <div class="hero-quick-field">
+                                <label for="hosp-type" class="hqs-label text-rose"><i class="fas fa-building"></i>
+                                    TYPE</label>
+                                <div class="hqs-select-wrap">
+                                    <select id="hosp-type" class="hqs-select" required>
+                                        <option value="">Select Type</option>
+                                        <option value="government">Government</option>
+                                        <option value="private">Private</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="hero-quick-row" style="margin-top: 24px">
+                            <div class="hero-quick-field">
+                                <label for="hosp-city" class="hqs-label text-rose"><i class="fas fa-city"></i>
+                                    CITY</label>
+                                <input type="text" id="hosp-city" class="hqs-location-input"
+                                    style="border: 1.5px solid var(--border-color); border-radius:var(--radius-sm); padding:10px 12px; font-size:0.9rem;"
+                                    placeholder="e.g., Delhi, Mumbai" required>
+                            </div>
+                            <div class="hero-quick-field">
+                                <label for="hosp-address" class="hqs-label text-rose"><i
+                                        class="fas fa-map-marker-alt"></i>
+                                    FULL ADDRESS</label>
+                                <input type="text" id="hosp-address" class="hqs-location-input"
+                                    style="border: 1.5px solid var(--border-color); border-radius:var(--radius-sm); padding:10px 12px; font-size:0.9rem;"
+                                    placeholder="Complete street address" required>
+                            </div>
+                        </div>
+
+                        <div class="hero-quick-row" style="margin-top: 24px">
+                            <div class="hero-quick-field">
+                                <label for="hosp-phone" class="hqs-label text-rose"><i class="fas fa-phone"></i>
+                                    CONTACT NUMBER</label>
+                                <input type="tel" id="hosp-phone" class="hqs-location-input"
+                                    style="border: 1.5px solid var(--border-color); border-radius:var(--radius-sm); padding:10px 12px; font-size:0.9rem;"
+                                    placeholder="e.g., +91 XXXXX XXXXX" required>
+                            </div>
+                            <div class="hero-quick-field">
+                                <label for="hosp-email" class="hqs-label text-rose"><i class="fas fa-envelope"></i>
+                                    EMAIL ADDRESS</label>
+                                <input type="email" id="hosp-email" class="hqs-location-input"
+                                    style="border: 1.5px solid var(--border-color); border-radius:var(--radius-sm); padding:10px 12px; font-size:0.9rem;"
+                                    placeholder="hospital@email.com" required>
+                            </div>
+                        </div>
+
+                        <div class="hero-quick-row" style="margin-top: 24px">
+                            <div class="hero-quick-field">
+                                <label for="hosp-rohini-reg" class="hqs-label text-rose"><i class="fas fa-id-badge"></i>
+                                    ROHINI ID</label>
+                                <input type="text" id="hosp-rohini-reg" class="hqs-location-input"
+                                    style="border: 1.5px solid var(--border-color); border-radius:var(--radius-sm); padding:10px 12px; font-size:0.9rem;"
+                                    placeholder="e.g., ROHINI123" required>
+                                <div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px">Unique system
+                                    identifier.</div>
+                            </div>
+                            <div class="hero-quick-field">
+                                <label for="hosp-pwd" class="hqs-label text-rose"><i class="fas fa-lock"></i>
+                                    PASSWORD</label>
+                                <input type="password" id="hosp-pwd" class="hqs-location-input"
+                                    style="border: 1.5px solid var(--border-color); border-radius:var(--radius-sm); padding:10px 12px; font-size:0.9rem;"
+                                    placeholder="Create account password" required>
+                            </div>
+                        </div>
+
+                        <div class="hero-quick-row" style="margin-top: 24px">
+                            <div class="hero-quick-field">
+                                <label for="hosp-license" class="hqs-label text-rose"><i class="fas fa-id-card"></i>
+                                    LICENSE NUMBER</label>
+                                <input type="text" id="hosp-license" class="hqs-location-input"
+                                    style="border: 1.5px solid var(--border-color); border-radius:var(--radius-sm); padding:10px 12px; font-size:0.9rem;"
+                                    placeholder="Medical license number" required>
+                                <div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px">Required for
+                                    verification of medical status.</div>
+                            </div>
+                            <div class="hero-quick-field">
+                                <label for="hosp-hours" class="hqs-label text-rose"><i class="fas fa-clock"></i>
+                                    OPERATING HOURS</label>
+                                <input type="text" id="hosp-hours" class="hqs-location-input"
+                                    style="border: 1.5px solid var(--border-color); border-radius:var(--radius-sm); padding:10px 12px; font-size:0.9rem;"
+                                    placeholder="e.g., 24/7 or 8AM - 10PM">
+                            </div>
+                        </div>
+
+                        <div class="hero-quick-field full" style="margin-top: 24px">
+                            <label for="hosp-services" class="hqs-label text-rose"><i class="fas fa-plus-square"></i>
+                                SERVICES AVAILABLE</label>
+                            <textarea id="hosp-services" rows="4"
+                                style="border: 1.5px solid var(--border-color); border-radius:var(--radius-sm); padding:12px; font-size:0.9rem; font-family:inherit; resize:vertical; outline:none;"
                                 placeholder="List your services (Blood Bank, ICU, Emergency, etc.)"></textarea>
+                            <div style="font-size:0.7rem; color:var(--text-muted); margin-top:4px">Please list specific
+                                departments and emergency services available. Use commas to separate.</div>
                         </div>
-                        <div class="form-actions">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-paper-plane"></i> Submit Registration
+
+                        <div
+                            style="margin-top: 40px; text-align:right; border-top:1px solid #e2e8f0; padding-top:24px; display:flex; justify-content:flex-end">
+                            <button type="submit" class="btn btn-primary hqs-submit-btn"
+                                style="width: auto; padding: 12px 32px">
+                                Register Hospital <i class="fas fa-arrow-right" style="margin-left:8px"></i>
                             </button>
                         </div>
                     </form>
@@ -382,7 +572,7 @@
             </div>
 
             <!-- Blood Bank Registration Form -->
-            <div id="bloodbank-reg" class="tab-content">
+            <div id="bloodbank-reg" class="tab-content" role="tabpanel" aria-labelledby="tab-bloodbank" tabindex="0">
                 <div class="register-card glass-card">
                     <form id="bloodbank-register-form" class="register-form">
                         <div class="form-grid">
@@ -429,7 +619,7 @@
             </div>
 
             <!-- Inventory Update Form -->
-            <div id="inventory-update" class="tab-content">
+            <div id="inventory-update" class="tab-content" role="tabpanel" aria-labelledby="tab-inventory" tabindex="0">
                 <div class="register-card glass-card">
                     <form id="inventory-update-form" class="register-form">
                         <div class="form-group">
@@ -616,7 +806,8 @@
     <!-- ═══════════════════ EMERGENCY MODAL ═══════════════════ -->
     <div id="emergency-modal" class="modal-overlay hidden">
         <div class="modal emergency-modal glass-card">
-            <button class="modal-close" id="modal-close-emergency">&times;</button>
+            <button class="modal-close" id="modal-close-emergency"
+                aria-label="Close emergency contacts modal">&times;</button>
             <div class="emergency-header">
                 <div class="emergency-pulse"></div>
                 <i class="fas fa-phone-alt"></i>
@@ -654,7 +845,8 @@
     <!-- ═══════════════════ SUCCESS MODAL ═══════════════════ -->
     <div id="success-modal" class="modal-overlay hidden">
         <div class="modal success-modal glass-card">
-            <button class="modal-close" id="modal-close-success">&times;</button>
+            <button class="modal-close" id="modal-close-success"
+                aria-label="Close success registration modal">&times;</button>
             <div class="success-content">
                 <div class="success-icon">
                     <i class="fas fa-check-circle"></i>
@@ -668,11 +860,12 @@
     </div>
 
     <!-- ═══════════════════ GEMMA AI CHATBOT ═══════════════════ -->
-    <div id="chatbot-toggle" class="chatbot-toggle">
+    <button id="chatbot-toggle" class="chatbot-toggle" type="button" aria-label="Open AI Assistant"
+        aria-haspopup="dialog" aria-expanded="false">
         <div class="chatbot-toggle-pulse"></div>
         <img src="assets/ai_avatar.png" alt="Gemma AI" class="chatbot-toggle-img">
         <span class="chatbot-badge">AI</span>
-    </div>
+    </button>
 
     <div id="chatbot-panel" class="chatbot-panel hidden">
         <div class="chatbot-header">
@@ -684,10 +877,10 @@
                 </div>
             </div>
             <div class="chatbot-header-actions">
-                <button class="chatbot-btn" id="chatbot-clear" title="Clear chat">
+                <button class="chatbot-btn" id="chatbot-clear" title="Clear chat" aria-label="Clear chat history">
                     <i class="fas fa-trash-alt"></i>
                 </button>
-                <button class="chatbot-btn" id="chatbot-minimize" title="Minimize">
+                <button class="chatbot-btn" id="chatbot-minimize" title="Minimize" aria-label="Minimize AI panel">
                     <i class="fas fa-minus"></i>
                 </button>
             </div>
@@ -714,7 +907,7 @@
             <div class="chatbot-input-wrap">
                 <input type="text" id="chatbot-input" placeholder="Ask Gemma anything about healthcare..."
                     autocomplete="off">
-                <button id="chatbot-send" class="chatbot-send-btn" title="Send message">
+                <button id="chatbot-send" class="chatbot-send-btn" title="Send message" aria-label="Send message">
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
@@ -759,15 +952,170 @@
                     <h4>Contact Us</h4>
                     <p><i class="fas fa-envelope"></i> support@raktsetu.medical</p>
                     <p><i class="fas fa-phone"></i> +91 1800-XXX-XXXX</p>
-                    <p><i class="fas fa-map-marker-alt"></i> New Delhi, India</p>
-                    <p><i class="fas fa-clock"></i> 24/7 Support Available</p>
+                    <p class="footer-emergency-line"><i class="fas fa-droplet text-rose"></i> <strong>Emergency:
+                            104</strong></p>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 RaktSetu Healthcare. All rights reserved. Powered by <strong>Gemma AI</strong>.</p>
+                <p>&copy; 2024 RaktSetu Healthcare. All rights reserved.</p>
             </div>
         </div>
     </footer>
+
+    <!-- ═══════════════════ LOGIN MODAL ═══════════════════ -->
+    <!-- ═══════════════════ LOGIN / AUTH MODAL ═══════════════════ -->
+    <div id="login-modal" class="login-modal-overlay">
+        <div class="login-modal-content">
+            <div class="login-left-panel">
+                <div class="login-left-content">
+                    <h2 id="auth-left-title">Welcome Back</h2>
+                    <p id="auth-left-desc">Please log in using your personal information to stay connected with us and
+                        help save lives.</p>
+                </div>
+            </div>
+            <div class="login-right-panel" id="auth-right-panel">
+
+                <!-- Authentication Forms Wrapper -->
+                <div class="auth-forms-container">
+
+                    <!-- Login View (Tabs for User/Hospital) -->
+                    <div id="view-login" class="auth-view active-view">
+                        <h2 class="login-title">LOGIN</h2>
+
+                        <div class="auth-tabs" role="tablist">
+                            <button type="button" class="auth-tab-btn active" data-tab="user-login-form">User</button>
+                            <button type="button" class="auth-tab-btn" data-tab="hospital-login-form">Hospital</button>
+                        </div>
+
+                        <!-- User Login Form -->
+                        <form id="user-login-form" class="auth-form active-form">
+                            <div class="login-form-group">
+                                <i class="fas fa-envelope form-icon"></i>
+                                <input type="email" id="user-login-email" placeholder="Email Address" required>
+                            </div>
+                            <div class="login-form-group password-group">
+                                <i class="fas fa-lock form-icon"></i>
+                                <input type="password" id="user-login-password" placeholder="Password" class="pwd-input"
+                                    required>
+                                <i class="fas fa-eye toggle-pwd"></i>
+                            </div>
+                            <div class="login-options">
+                                <a href="#" class="forgot-pwd auth-link" data-target="view-forgot">Forgot password?</a>
+                            </div>
+                            <button type="submit" class="btn btn-login-submit">Continue to OTP</button>
+                            <p class="signup-prompt">Don't have an account? <a href="#" class="auth-link"
+                                    data-target="view-signup">Signup</a></p>
+                        </form>
+
+                        <!-- Hospital Login Form -->
+                        <form id="hospital-login-form" class="auth-form hidden-form">
+                            <div class="login-form-group">
+                                <i class="fas fa-hospital form-icon"></i>
+                                <input type="text" id="hosp-rohini" placeholder="Rohini ID" required>
+                            </div>
+                            <div class="login-form-group">
+                                <i class="fas fa-envelope form-icon"></i>
+                                <input type="email" id="hosp-login-email" placeholder="Hospital Email" required>
+                            </div>
+                            <div class="login-form-group password-group">
+                                <i class="fas fa-lock form-icon"></i>
+                                <input type="password" id="hosp-login-password" placeholder="Password" class="pwd-input"
+                                    required>
+                                <i class="fas fa-eye toggle-pwd"></i>
+                            </div>
+                            <div class="login-options">
+                                <a href="#" class="forgot-pwd auth-link" data-target="view-forgot">Forgot password?</a>
+                            </div>
+                            <button type="submit" class="btn btn-login-submit">Log In as Hospital</button>
+                            <p class="signup-prompt">Not registered? <a href="#"
+                                    onclick="document.body.style.overflow=''; document.getElementById('login-modal').classList.remove('active'); document.getElementById('register-section').scrollIntoView(); return false;">Apply
+                                    Here</a></p>
+                        </form>
+                    </div>
+
+                    <!-- OTP Verification View -->
+                    <div id="view-otp" class="auth-view hidden-view">
+                        <h2 class="login-title">Verify OTP</h2>
+                        <p style="text-align:center;font-size:0.85rem;color:var(--text-muted);margin-bottom:20px;">We've
+                            sent a code to your registered mobile number.</p>
+
+                        <form id="otp-form">
+                            <div class="login-form-group">
+                                <i class="fas fa-phone form-icon"></i>
+                                <input type="tel" id="otp-phone" placeholder="Confirm your Phone Number" required>
+                            </div>
+                            <div class="login-form-group"
+                                style="display:flex; justify-content:center; gap:10px; margin-top:20px;">
+                                <input type="text" class="otp-input-box" maxlength="1" required
+                                    style="width:50px; text-align:center; padding:12px; font-size:1.2rem; font-weight:bold; border:2px solid var(--border-color); border-radius:8px;">
+                                <input type="text" class="otp-input-box" maxlength="1" required
+                                    style="width:50px; text-align:center; padding:12px; font-size:1.2rem; font-weight:bold; border:2px solid var(--border-color); border-radius:8px;">
+                                <input type="text" class="otp-input-box" maxlength="1" required
+                                    style="width:50px; text-align:center; padding:12px; font-size:1.2rem; font-weight:bold; border:2px solid var(--border-color); border-radius:8px;">
+                                <input type="text" class="otp-input-box" maxlength="1" required
+                                    style="width:50px; text-align:center; padding:12px; font-size:1.2rem; font-weight:bold; border:2px solid var(--border-color); border-radius:8px;">
+                            </div>
+                            <button type="submit" class="btn btn-login-submit" style="margin-top:24px;">Verify & Log
+                                In</button>
+                            <p class="signup-prompt"><a href="#" class="auth-link" data-target="view-login"><i
+                                        class="fas fa-arrow-left"></i> Back to Login</a></p>
+                        </form>
+                    </div>
+
+                    <!-- Signup View -->
+                    <div id="view-signup" class="auth-view hidden-view">
+                        <h2 class="login-title">CREATE ACCOUNT</h2>
+                        <form id="signup-form">
+                            <div class="login-form-group">
+                                <i class="fas fa-user form-icon"></i>
+                                <input type="text" id="signup-name" placeholder="Full Name" required>
+                            </div>
+                            <div class="login-form-group">
+                                <i class="fas fa-envelope form-icon"></i>
+                                <input type="email" id="signup-email" placeholder="Email Address" required>
+                            </div>
+                            <div class="login-form-group">
+                                <i class="fas fa-phone form-icon"></i>
+                                <input type="tel" id="signup-phone" placeholder="Phone Number" required>
+                            </div>
+                            <div class="login-form-group password-group">
+                                <i class="fas fa-lock form-icon"></i>
+                                <input type="password" id="signup-password" placeholder="Password" class="pwd-input"
+                                    required>
+                                <i class="fas fa-eye toggle-pwd"></i>
+                            </div>
+                            <button type="submit" class="btn btn-login-submit">Sign Up</button>
+                            <p class="signup-prompt">Already have an account? <a href="#" class="auth-link"
+                                    data-target="view-login">Log In</a></p>
+                        </form>
+                    </div>
+
+                    <!-- Forgot Password View -->
+                    <div id="view-forgot" class="auth-view hidden-view">
+                        <h2 class="login-title">RESET PASSWORD</h2>
+                        <p style="text-align:center;font-size:0.85rem;color:var(--text-muted);margin-bottom:20px;">Enter
+                            your email to reset password.</p>
+                        <form id="forgot-form">
+                            <div class="login-form-group">
+                                <i class="fas fa-envelope form-icon"></i>
+                                <input type="email" id="forgot-email" placeholder="Email Address" required>
+                            </div>
+                            <div class="login-form-group password-group" id="new-pwd-group" style="display:none;">
+                                <i class="fas fa-lock form-icon"></i>
+                                <input type="password" id="forgot-new-pwd" placeholder="New Password" class="pwd-input">
+                                <i class="fas fa-eye toggle-pwd"></i>
+                            </div>
+                            <button type="submit" class="btn btn-login-submit" id="btn-forgot-submit">Send Reset
+                                Link</button>
+                            <p class="signup-prompt"><a href="#" class="auth-link" data-target="view-login"><i
+                                        class="fas fa-arrow-left"></i> Back to Login</a></p>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- ═══════════════════ SCRIPTS ═══════════════════ -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

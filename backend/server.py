@@ -218,3 +218,11 @@ def serve_app_js():
 @app.get("/")
 def serve_index():
     return FileResponse(os.path.join(FRONTEND_DIR, "index.html"), media_type="text/html")
+
+@app.get("/dashboard.html")
+def serve_dashboard():
+    return FileResponse(os.path.join(FRONTEND_DIR, "dashboard.html"), media_type="text/html")
+
+@app.get("/dashboard.css")
+def serve_dashboard_css():
+    return FileResponse(os.path.join(FRONTEND_DIR, "dashboard.css"), media_type="text/css")

@@ -1,7 +1,37 @@
 // ═══════════════════ APP INITIALIZATION ═══════════════════
+const USERS_STORAGE_KEY = 'raktsetu_registered_users';
+const HOSPITALS_STORAGE_KEY = 'raktsetu_registered_hospitals';
+
+let pendingUser = null;
+let pendingResetEmail = null;
+let pendingResetRole = null;
+
+function initAuthStores() {
+    if (!localStorage.getItem(USERS_STORAGE_KEY)) {
+        const defaultUsers = [
+            { name: 'Demo User', email: 'user@example.com', phone: '9876543210', password: 'password123' }
+        ];
+        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(defaultUsers));
+    }
+    if (!localStorage.getItem(HOSPITALS_STORAGE_KEY)) {
+        const defaultHospitals = [
+            {
+                name: 'AIIMS Hospital & Blood Bank',
+                email: 'hosp@example.com',
+                phone: '9876543210',
+                password: 'password123',
+                rohiniId: 'ROHINI123'
+            }
+        ];
+        localStorage.setItem(HOSPITALS_STORAGE_KEY, JSON.stringify(defaultHospitals));
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    initAuthStores();
     initSplash();
     initNavbar();
+    initLoginModal();
     initHeroStats();
     initSearchForm();
     initHospitalDirectory();
@@ -13,19 +43,33 @@ document.addEventListener('DOMContentLoaded', () => {
 // ═══════════════════ SPLASH SCREEN ═══════════════════
 function initSplash() {
     const splash = document.getElementById('splash-screen');
+
+    // Always clear session on page load so login is always required
+    sessionStorage.removeItem('raktsetuLoggedIn');
+    sessionStorage.removeItem('raktsetuUser');
+    sessionStorage.removeItem('raktsetuRole');
+
+    // Reset default visibility for unregistered usage
+    const registerSection = document.getElementById('register-section');
+    const registerNav = document.querySelector('.nav-link[data-section="register-section"]');
+    if (registerSection) registerSection.style.display = 'block';
+    if (registerNav) registerNav.style.display = 'flex';
+
     // Create floating particles
     const particlesEl = document.getElementById('splash-particles');
-    for (let i = 0; i < 30; i++) {
-        const p = document.createElement('div');
-        p.style.cssText = `
-            position:absolute;
-            width:${Math.random() * 4 + 2}px; height:${Math.random() * 4 + 2}px;
-            background:${Math.random() > 0.5 ? 'rgba(239,68,68,0.4)' : 'rgba(6,182,212,0.4)'};
-            border-radius:50%; left:${Math.random() * 100}%; top:${Math.random() * 100}%;
-            animation: float-particle ${Math.random() * 4 + 3}s ease-in-out infinite alternate;
-            animation-delay: ${Math.random() * 2}s;
-        `;
-        particlesEl.appendChild(p);
+    if (particlesEl) {
+        for (let i = 0; i < 30; i++) {
+            const p = document.createElement('div');
+            p.style.cssText = `
+                position:absolute;
+                width:${Math.random() * 4 + 2}px; height:${Math.random() * 4 + 2}px;
+                background:${Math.random() > 0.5 ? 'rgba(239,68,68,0.4)' : 'rgba(6,182,212,0.4)'};
+                border-radius:50%; left:${Math.random() * 100}%; top:${Math.random() * 100}%;
+                animation: float-particle ${Math.random() * 4 + 3}s ease-in-out infinite alternate;
+                animation-delay: ${Math.random() * 2}s;
+            `;
+            particlesEl.appendChild(p);
+        }
     }
     const style = document.createElement('style');
     style.textContent = `@keyframes float-particle {
@@ -35,8 +79,18 @@ function initSplash() {
     document.head.appendChild(style);
 
     setTimeout(() => {
-        splash.classList.add('fade-out');
-        setTimeout(() => { splash.style.display = 'none'; }, 800);
+        if (splash) {
+            splash.classList.add('fade-out');
+            setTimeout(() => {
+                splash.style.display = 'none';
+                // ✔ Auto-open login modal after splash finishes
+                const modal = document.getElementById('login-modal');
+                if (modal) {
+                    modal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+            }, 800);
+        }
     }, 2800);
 }
 
@@ -79,9 +133,478 @@ function initNavbar() {
     sections.forEach(s => observer.observe(s));
 }
 
+// ═══════════════════ LOGIN MODAL & AUTH FLOW ═══════════════════
+function initLoginModal() {
+    const modal = document.getElementById('login-modal');
+
+    function closeModal() {
+        if (modal) modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // Toggle Password Visibility
+    document.querySelectorAll('.toggle-pwd').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const input = e.target.parentElement.querySelector('.pwd-input');
+            if (input) {
+                const show = input.type === 'password';
+                input.type = show ? 'text' : 'password';
+                e.target.classList.toggle('fa-eye', !show);
+                e.target.classList.toggle('fa-eye-slash', show);
+            }
+        });
+    });
+
+    // View Switching (Login, OTP, Signup, Forgot Pwd)
+    document.querySelectorAll('.auth-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = e.target.closest('.auth-link').dataset.target;
+            document.querySelectorAll('.auth-view').forEach(view => {
+                view.classList.remove('active-view');
+                view.classList.add('hidden-view');
+            });
+            document.getElementById(targetId).classList.remove('hidden-view');
+            document.getElementById(targetId).classList.add('active-view');
+        });
+    });
+
+    // Login Tabs (User / Hospital)
+    document.querySelectorAll('.auth-tab-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.auth-tab-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+
+            const targetFormId = e.target.dataset.tab;
+            document.querySelectorAll('#view-login .auth-form').forEach(f => {
+                f.classList.remove('active-form');
+                f.classList.add('hidden-form');
+                f.style.display = 'none';
+            });
+            const targetForm = document.getElementById(targetFormId);
+            targetForm.classList.remove('hidden-form');
+            targetForm.classList.add('active-form');
+            targetForm.style.display = 'block';
+        });
+    });
+
+    // Hospital Login Submit
+    const hospForm = document.getElementById('hospital-login-form');
+    if (hospForm) {
+        hospForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const rohiniInput = document.getElementById('hosp-rohini').value.trim();
+            const emailInput = document.getElementById('hosp-login-email').value.trim();
+            const passwordInput = document.getElementById('hosp-login-password').value;
+            const btn = e.target.querySelector('button[type="submit"]');
+
+            const hospitals = JSON.parse(localStorage.getItem(HOSPITALS_STORAGE_KEY) || '[]');
+            const foundHosp = hospitals.find(h =>
+                h.email.toLowerCase() === emailInput.toLowerCase() &&
+                h.password === passwordInput &&
+                h.rohiniId.toUpperCase() === rohiniInput.toUpperCase()
+            );
+
+            if (!foundHosp) {
+                showNotification('Invalid email, password, or Rohini ID.', 'error');
+                return;
+            }
+
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                sessionStorage.setItem('raktsetuRole', 'hospital');
+                sessionStorage.setItem('raktsetuUser', foundHosp.name);
+                sessionStorage.setItem('raktsetuLoggedIn', 'true');
+
+                applyRoleLogic('hospital');
+                updateNavUser('hospital', foundHosp.name);
+                closeModal();
+                btn.innerHTML = 'Log In as Hospital';
+                btn.disabled = false;
+                hospForm.reset();
+            }, 1000);
+        });
+    }
+
+    // User Login Step 1 (Enter Email & Password)
+    const userForm = document.getElementById('user-login-form');
+    if (userForm) {
+        userForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const emailInput = document.getElementById('user-login-email').value.trim();
+            const passwordInput = document.getElementById('user-login-password').value;
+            const btn = e.target.querySelector('button[type="submit"]');
+
+            const users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
+            const foundUser = users.find(u => u.email.toLowerCase() === emailInput.toLowerCase() && u.password === passwordInput);
+
+            if (!foundUser) {
+                showNotification('Invalid email or password.', 'error');
+                return;
+            }
+
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending OTP...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                pendingUser = foundUser;
+                // Transition to OTP view
+                document.getElementById('view-login').classList.remove('active-view');
+                document.getElementById('view-login').classList.add('hidden-view');
+                document.getElementById('view-otp').classList.remove('hidden-view');
+                document.getElementById('view-otp').classList.add('active-view');
+
+                // Show notification with simulated OTP for verification
+                const last4Digits = foundUser.phone.slice(-4);
+                showNotification(`OTP code sent to phone ending in ****${last4Digits}. (Simulated OTP: 1234)`, 'success');
+
+                btn.innerHTML = 'Continue to OTP';
+                btn.disabled = false;
+            }, 800);
+        });
+    }
+
+    // User Login Step 2 (Verify OTP & Phone Number)
+    const otpForm = document.getElementById('otp-form');
+    if (otpForm) {
+        otpForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const phoneInput = document.getElementById('otp-phone').value.trim();
+
+            // Gather OTP digit values
+            const otpBoxes = document.querySelectorAll('.otp-input-box');
+            let otpCode = '';
+            otpBoxes.forEach(box => otpCode += box.value.trim());
+
+            if (!pendingUser) {
+                showNotification('No login session active. Please try again.', 'error');
+                return;
+            }
+
+            const cleanedPhoneInput = phoneInput.replace(/[-+()\s]/g, '');
+            const cleanedUserPhone = pendingUser.phone.replace(/[-+()\s]/g, '');
+
+            const phoneMatches = cleanedPhoneInput.endsWith(cleanedUserPhone) || cleanedUserPhone.endsWith(cleanedPhoneInput);
+
+            if (!phoneMatches) {
+                showNotification('Phone number does not match registered phone number.', 'error');
+                return;
+            }
+
+            if (otpCode !== '1234') {
+                showNotification('Invalid OTP code. Please enter 1234.', 'error');
+                return;
+            }
+
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                sessionStorage.setItem('raktsetuRole', 'user');
+                sessionStorage.setItem('raktsetuUser', pendingUser.name);
+                sessionStorage.setItem('raktsetuLoggedIn', 'true');
+
+                applyRoleLogic('user');
+                updateNavUser('user', pendingUser.name);
+                closeModal();
+                btn.innerHTML = 'Verify & Log In';
+                btn.disabled = false;
+                userForm.reset();
+                otpForm.reset();
+                pendingUser = null;
+            }, 1000);
+        });
+    }
+
+    // Signup Submit
+    const signupForm = document.getElementById('signup-form');
+    if (signupForm) {
+        signupForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const nameInput = document.getElementById('signup-name').value.trim();
+            const emailInput = document.getElementById('signup-email').value.trim();
+            const phoneInput = document.getElementById('signup-phone').value.trim();
+            const passwordInput = document.getElementById('signup-password').value;
+            const btn = e.target.querySelector('button[type="submit"]');
+
+            const users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
+            const emailExists = users.some(u => u.email.toLowerCase() === emailInput.toLowerCase());
+
+            if (emailExists) {
+                showNotification('Email is already registered.', 'error');
+                return;
+            }
+
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registering...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                users.push({
+                    name: nameInput,
+                    email: emailInput,
+                    phone: phoneInput,
+                    password: passwordInput
+                });
+                localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+
+                showNotification('Account created successfully! Please log in.', 'success');
+
+                // Switch back to login
+                document.getElementById('view-signup').classList.remove('active-view');
+                document.getElementById('view-signup').classList.add('hidden-view');
+                document.getElementById('view-login').classList.remove('hidden-view');
+                document.getElementById('view-login').classList.add('active-view');
+
+                btn.innerHTML = 'Sign Up';
+                btn.disabled = false;
+                signupForm.reset();
+            }, 1200);
+        });
+    }
+
+    // Forgot Password Submit
+    const forgotForm = document.getElementById('forgot-form');
+    if (forgotForm) {
+        forgotForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-forgot-submit');
+            const pwdGroup = document.getElementById('new-pwd-group');
+            const emailInput = document.getElementById('forgot-email').value.trim();
+
+            if (pwdGroup.style.display === 'none') {
+                const users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
+                const hospitals = JSON.parse(localStorage.getItem(HOSPITALS_STORAGE_KEY) || '[]');
+
+                const userAccNum = users.findIndex(u => u.email.toLowerCase() === emailInput.toLowerCase());
+                const hospAccNum = hospitals.findIndex(h => h.email.toLowerCase() === emailInput.toLowerCase());
+
+                if (userAccNum === -1 && hospAccNum === -1) {
+                    showNotification('No registered account found with this email.', 'error');
+                    return;
+                }
+
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+                btn.disabled = true;
+
+                setTimeout(() => {
+                    pendingResetEmail = emailInput;
+                    pendingResetRole = userAccNum !== -1 ? 'user' : 'hospital';
+
+                    pwdGroup.style.display = 'block';
+                    btn.innerHTML = 'Update Password';
+                    btn.disabled = false;
+                    document.getElementById('forgot-new-pwd').required = true;
+                    showNotification('Verification success! Input your new password.', 'success');
+                }, 1000);
+            } else {
+                const newPasswordVal = document.getElementById('forgot-new-pwd').value;
+                if (!newPasswordVal) {
+                    showNotification('Please enter a new password.', 'error');
+                    return;
+                }
+
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+                btn.disabled = true;
+
+                setTimeout(() => {
+                    if (pendingResetRole === 'user') {
+                        const users = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || '[]');
+                        const idx = users.findIndex(u => u.email.toLowerCase() === pendingResetEmail.toLowerCase());
+                        if (idx !== -1) {
+                            users[idx].password = newPasswordVal;
+                            localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+                        }
+                    } else if (pendingResetRole === 'hospital') {
+                        const hospitals = JSON.parse(localStorage.getItem(HOSPITALS_STORAGE_KEY) || '[]');
+                        const idx = hospitals.findIndex(h => h.email.toLowerCase() === pendingResetEmail.toLowerCase());
+                        if (idx !== -1) {
+                            hospitals[idx].password = newPasswordVal;
+                            localStorage.setItem(HOSPITALS_STORAGE_KEY, JSON.stringify(hospitals));
+                        }
+                    }
+
+                    showNotification('Password updated successfully! Please log in.', 'success');
+                    btn.innerHTML = 'Send Reset Link';
+                    btn.disabled = false;
+                    pwdGroup.style.display = 'none';
+                    document.getElementById('forgot-new-pwd').required = false;
+                    forgotForm.reset();
+                    pendingResetEmail = null;
+                    pendingResetRole = null;
+
+                    // Back to login
+                    document.getElementById('view-forgot').classList.remove('active-view');
+                    document.getElementById('view-forgot').classList.add('hidden-view');
+                    document.getElementById('view-login').classList.remove('hidden-view');
+                    document.getElementById('view-login').classList.add('active-view');
+                }, 1000);
+            }
+        });
+    }
+
+    // OTP Input auto-advance
+    const otpInputs = document.querySelectorAll('.otp-input-box');
+    otpInputs.forEach((input, index) => {
+        input.addEventListener('keyup', function (e) {
+            if (this.value.length === 1 && index < otpInputs.length - 1) {
+                otpInputs[index + 1].focus();
+            }
+            if (e.key === 'Backspace' && index > 0) {
+                otpInputs[index - 1].focus();
+            }
+        });
+    });
+}
+
+// ═══════════════════ ROLE BASED ACCESS CONTROL ═══════════════════
+function applyRoleLogic(role) {
+    const heroSearchBtn = document.getElementById('hero-search-btn');
+    const heroHospBtn = document.getElementById('hero-hospitals-btn');
+
+    // Page Sections
+    const searchSection = document.getElementById('search-section');
+    const hospitalSection = document.getElementById('hospitals-section');
+    const registerSection = document.getElementById('register-section');
+
+    // Nav Links / Buttons
+    const searchNav = document.querySelector('.nav-link[data-section="search-section"]');
+    const hospitalNav = document.querySelector('.nav-link[data-section="hospitals-section"]');
+    const registerNav = document.querySelector('.nav-link[data-section="register-section"]');
+    const registerBtn = document.getElementById('btn-register-trigger');
+
+    // Hero Search Card
+    const heroSearchCard = document.querySelector('.hero-search-card');
+
+    if (role === 'hospital') {
+        // Hospitals shouldn't see search or directories
+        if (searchSection) searchSection.style.display = 'none';
+        if (hospitalSection) hospitalSection.style.display = 'none';
+        if (searchNav) searchNav.style.display = 'none';
+        if (hospitalNav) hospitalNav.style.display = 'none';
+
+        // Hospitals must see registration/donate, nav items, and Register trigger
+        if (registerSection) registerSection.style.display = 'block';
+        if (registerNav) registerNav.style.display = 'flex';
+        if (registerBtn) registerBtn.style.display = 'inline-flex';
+
+        // Hide main search prompts in hero
+        if (heroSearchBtn) heroSearchBtn.style.display = 'none';
+        if (heroHospBtn) heroHospBtn.style.display = 'none';
+        if (heroSearchCard) heroSearchCard.style.display = 'none';
+
+        showNotification('Logged in as Hospital Facility.', 'success');
+    }
+    else if (role === 'user') {
+        // Users shouldn't see registration
+        if (registerSection) registerSection.style.display = 'none';
+        if (registerNav) registerNav.style.display = 'none';
+        if (registerBtn) registerBtn.style.display = 'none';
+
+        // Users must see search directories
+        if (searchSection) searchSection.style.display = 'block';
+        if (hospitalSection) hospitalSection.style.display = 'block';
+        if (searchNav) searchNav.style.display = 'flex';
+        if (hospitalNav) hospitalNav.style.display = 'flex';
+
+        // Show main search prompts in hero
+        if (heroSearchBtn) heroSearchBtn.style.display = 'inline-flex';
+        if (heroHospBtn) heroHospBtn.style.display = 'inline-flex';
+        if (heroSearchCard) heroSearchCard.style.display = 'block';
+
+        showNotification('Logged in successfully.', 'success');
+    }
+}
+
+// ═══════════════════ NAV USER PROFILE SIGNATURE ═══════════════════
+function updateNavUser(role, displayName) {
+    const navActions = document.querySelector('.nav-actions');
+    if (!navActions) return;
+
+    // Remove any existing user chips
+    const oldChip = document.getElementById('nav-user-profile-chip');
+    if (oldChip) oldChip.remove();
+
+    if (displayName) {
+        // Create user chip
+        const chip = document.createElement('div');
+        chip.id = 'nav-user-profile-chip';
+        chip.className = 'nav-user-chip';
+        chip.innerHTML = `
+            <div class="nav-user-avatar">
+                <i class="fas fa-${role === 'hospital' ? 'hospital' : 'user'}"></i>
+            </div>
+            <span class="nav-user-name">${displayName}</span>
+            <button class="nav-logout-btn" id="btn-nav-logout" title="Log Out" aria-label="Log out">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        `;
+
+        // Insert at the beginning of navActions
+        navActions.insertBefore(chip, navActions.firstChild);
+
+        // Bind logout button click
+        const logoutBtn = chip.querySelector('#btn-nav-logout');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                logoutUser();
+            });
+        }
+    }
+}
+
+function logoutUser() {
+    sessionStorage.removeItem('raktsetuLoggedIn');
+    sessionStorage.removeItem('raktsetuUser');
+    sessionStorage.removeItem('raktsetuRole');
+
+    // Clear user chip
+    const oldChip = document.getElementById('nav-user-profile-chip');
+    if (oldChip) oldChip.remove();
+
+    // Show splash-like reset or redirect, and display login modal again
+    const modal = document.getElementById('login-modal');
+    if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    // Reset view
+    const searchSection = document.getElementById('search-section');
+    const hospitalSection = document.getElementById('hospitals-section');
+    const registerSection = document.getElementById('register-section');
+
+    const searchNav = document.querySelector('.nav-link[data-section="search-section"]');
+    const hospitalNav = document.querySelector('.nav-link[data-section="hospitals-section"]');
+    const registerNav = document.querySelector('.nav-link[data-section="register-section"]');
+    const regBtn = document.getElementById('btn-register-trigger');
+    const heroSearchBtn = document.getElementById('hero-search-btn');
+    const heroHospBtn = document.getElementById('hero-hospitals-btn');
+    const heroCard = document.querySelector('.hero-search-card');
+
+    if (searchSection) searchSection.style.display = 'block';
+    if (hospitalSection) hospitalSection.style.display = 'block';
+    if (registerSection) registerSection.style.display = 'block';
+
+    if (searchNav) searchNav.style.display = 'flex';
+    if (hospitalNav) hospitalNav.style.display = 'flex';
+    if (registerNav) registerNav.style.display = 'flex';
+    if (regBtn) regBtn.style.display = 'inline-flex';
+
+    if (heroSearchBtn) heroSearchBtn.style.display = 'inline-flex';
+    if (heroHospBtn) heroHospBtn.style.display = 'inline-flex';
+    if (heroCard) heroCard.style.display = 'block';
+
+    showNotification('Logged out successfully.', 'info');
+}
+
 // ═══════════════════ HERO STATS COUNTER ═══════════════════
 function initHeroStats() {
-    const counters = document.querySelectorAll('.stat-number');
+    // Observe both old .stat-number and new .stat-card-number elements
+    const counters = document.querySelectorAll('.stat-number, .stat-card-number');
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -119,9 +642,16 @@ function initSearchForm() {
     const bloodGroupInput = document.getElementById('blood-group');
     const bloodBtnCards = document.querySelectorAll('.blood-btn-card');
     bloodBtnCards.forEach(card => {
+        card.setAttribute('role', 'button');
+        card.setAttribute('aria-pressed', 'false');
+        card.setAttribute('aria-label', `Select blood group ${card.dataset.value}`);
         card.addEventListener('click', () => {
-            bloodBtnCards.forEach(c => c.classList.remove('active'));
+            bloodBtnCards.forEach(c => {
+                c.classList.remove('active');
+                c.setAttribute('aria-pressed', 'false');
+            });
             card.classList.add('active');
+            card.setAttribute('aria-pressed', 'true');
             bloodGroupInput.value = card.dataset.value;
         });
     });
@@ -162,7 +692,64 @@ function initSearchForm() {
     const loginTrig = document.getElementById('btn-login-trigger');
     const regTrig = document.getElementById('btn-register-trigger');
     if (loginTrig) loginTrig.addEventListener('click', () => showNotification('Authentication service is coming soon!', 'info'));
-    if (regTrig) regTrig.addEventListener('click', () => showNotification('Host / Blood Bank Registration is below section.', 'info'));
+    if (regTrig) {
+        regTrig.addEventListener('click', () => {
+            const regSection = document.getElementById('register-section');
+            if (regSection) regSection.scrollIntoView({ behavior: 'smooth' });
+        });
+    }
+
+    // ── Hero Quick Blood Search card wiring ───────────────────────
+    const heroForm = document.getElementById('hero-quick-search-form');
+    const hqsLocateBtn = document.getElementById('hqs-locate-btn');
+
+    if (heroForm) {
+        heroForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const hqsGroup = document.getElementById('hqs-blood-group').value;
+            const hqsLocation = document.getElementById('hqs-location').value.trim();
+            const hqsRadius = document.getElementById('hqs-radius').value;
+
+            if (!hqsGroup) { showNotification('Please select a blood group.', 'warning'); return; }
+            if (!hqsLocation) { showNotification('Please enter a location.', 'warning'); return; }
+
+            // Prefill the main search form
+            const mainBloodInput = document.getElementById('blood-group');
+            const mainLocInput = document.getElementById('location-input');
+            const mainRadiusSelect = document.getElementById('search-radius');
+            if (mainBloodInput) mainBloodInput.value = hqsGroup;
+            if (mainLocInput) mainLocInput.value = hqsLocation;
+            if (mainRadiusSelect) mainRadiusSelect.value = hqsRadius;
+
+            // Sync active blood button in main form
+            document.querySelectorAll('.blood-btn-card').forEach(c => {
+                c.classList.toggle('active', c.dataset.value === hqsGroup);
+            });
+
+            // Scroll to search section and trigger search
+            document.getElementById('search-section').scrollIntoView({ behavior: 'smooth' });
+            setTimeout(() => performSearch(), 600);
+        });
+    }
+
+    if (hqsLocateBtn) {
+        hqsLocateBtn.addEventListener('click', () => {
+            if (navigator.geolocation) {
+                hqsLocateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        const locInput = document.getElementById('hqs-location');
+                        if (locInput) locInput.value = `${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`;
+                        hqsLocateBtn.innerHTML = '<i class="fas fa-crosshairs"></i> Use Current';
+                    },
+                    () => {
+                        hqsLocateBtn.innerHTML = '<i class="fas fa-crosshairs"></i> Use Current';
+                        showNotification('Location access denied. Please enter manually.', 'warning');
+                    }
+                );
+            }
+        });
+    }
 }
 
 function performSearch() {
@@ -290,10 +877,10 @@ function displayResults(results, group, userCoords) {
             </div>
             
             <div class="result-card-actions-new">
-                <a href="tel:${r.phone.replace(/\s/g, '')}" class="btn btn-primary btn-card-action">
+                <a href="tel:${r.phone.replace(/\s/g, '')}" class="btn btn-primary btn-card-action" aria-label="Call ${r.name}">
                     <i class="fas fa-phone-alt"></i> Call Facility
                 </a>
-                <button type="button" class="btn btn-outline btn-card-action" onclick="showOnMap(${r.lat}, ${r.lng}, '${r.name.replace(/'/g, "\\'")}')">
+                <button type="button" class="btn btn-outline btn-card-action" onclick="showOnMap(${r.lat}, ${r.lng}, '${r.name.replace(/'/g, "\\'")}')" aria-label="Show ${r.name} on map">
                     <i class="fas fa-map-marked-alt"></i> Show Location
                 </button>
             </div>
@@ -307,8 +894,12 @@ function displayResults(results, group, userCoords) {
     // Filter buttons callback
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                b.classList.remove('active');
+                b.setAttribute('aria-pressed', 'false');
+            });
             btn.classList.add('active');
+            btn.setAttribute('aria-pressed', 'true');
             const filter = btn.dataset.filter;
             document.querySelectorAll('.result-card-new').forEach(card => {
                 if (filter === 'all') card.style.display = '';
@@ -409,47 +1000,73 @@ function filterHospitals() {
 
 function renderHospitals(list) {
     const grid = document.getElementById('hospitals-grid');
-    grid.innerHTML = list.map(h => `
-        <div class="result-card" data-type="${h.category}">
-            <div class="result-card-header">
-                <h4>${h.name}</h4>
-                <span class="result-type-tag ${h.category}">
-                    ${h.category === 'blood-bank' ? 'Blood Bank' : h.type === 'government' ? 'Govt' : 'Private'}
-                </span>
+    grid.innerHTML = list.map(h => {
+        const typeLabel = h.category === 'blood-bank' ? 'BLOOD BANK' : h.type === 'government' ? 'GOVT' : 'PRIVATE';
+        const typeClass = h.category === 'blood-bank' ? 'blood-bank' : h.type === 'government' ? 'government' : 'private';
+
+        // Mock a distance and time for the UI since it's a directory
+        const mockDist = (Math.random() * 8 + 1).toFixed(1);
+        const mockMin = Math.floor(Math.random() * 50 + 5);
+
+        // Find mostly requested blood type for this card mock
+        let highlightBg = 'O+';
+        let highlightUnits = h.blood['O+'] || 0;
+        let statusClass = highlightUnits > 0 ? 'available' : 'unavailable';
+        let statusText = highlightUnits > 0 ? 'AVAILABLE' : 'UNAVAILABLE';
+
+        return `
+        <div class="directory-card-new" data-type="${h.category}">
+            <div class="dir-card-top">
+                <span class="dir-badge ${typeClass}"><i class="fas fa-check-circle" style="margin-right:4px"></i> ${typeLabel}</span>
+                <span class="dir-badge-dist"><i class="fas fa-location-arrow"></i> ${mockDist} km</span>
             </div>
-            <div class="result-meta">
-                <span><i class="fas fa-city"></i> ${h.city}</span>
-                <span><i class="fas fa-map-marker-alt"></i> ${h.address}</span>
-                <span><i class="fas fa-phone"></i> ${h.phone}</span>
-                <span><i class="fas fa-clock"></i> ${h.hours}</span>
+            
+            <h4 class="dir-card-title">${h.name}</h4>
+            <div class="dir-card-address"><i class="fas fa-map-marker-alt"></i> ${h.address}, ${h.city}</div>
+            
+            <div class="dir-blood-status-box">
+                <div class="dir-blood-label">SAMPLE BLOOD TYPE STATUS</div>
+                <div class="dir-blood-row">
+                    <span class="dir-big-bg text-rose">${highlightBg}</span>
+                    <span class="dir-status-pill ${statusClass}"><i class="fas fa-circle"></i> ${statusText}</span>
+                    <span class="dir-time-pill"><i class="fas fa-history"></i> ${mockMin} mins ago</span>
+                </div>
             </div>
-            <div class="result-blood-available">
-                ${Object.entries(h.blood).map(([bg, units]) =>
-        `<span class="blood-tag ${units === 0 ? 'unavailable' : ''}">${bg}: ${units}</span>`
-    ).join('')}
-            </div>
-            <div class="result-meta" style="margin-bottom:0">
-                <span><i class="fas fa-stethoscope"></i> ${h.services.join(', ')}</span>
+
+            <div class="dir-card-actions">
+                <button type="button" class="btn btn-outline hqs-submit-btn" style="width:100%; border:1.5px solid var(--accent-rose); color:var(--accent-rose); padding:10px" aria-label="Details for ${h.name}" onclick="showHospitalDetails('${h.name.replace(/'/g, "\\'").replace(/"/g, '&quot;')}', '${h.address.replace(/'/g, "\\'").replace(/"/g, '&quot;')}', '${h.city}', '${h.phone}', '${h.hours}', '${h.type || h.category}')">
+                    <i class="fas fa-info-circle"></i> Details
+                </button>
+                <button type="button" class="btn btn-outline-dark hqs-submit-btn" style="width:100%; padding:10px" onclick="window.open('tel:${h.phone.replace(/\s/g, '')}')" aria-label="Call ${h.name}">
+                    <i class="fas fa-phone-alt"></i> Call Now
+                </button>
             </div>
         </div>
-    `).join('');
+        `;
+    }).join('');
 
     if (list.length === 0) {
         grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text-muted)">
             <i class="fas fa-search" style="font-size:2.5rem;margin-bottom:16px;display:block;opacity:0.3"></i>
-            <p>No hospitals found matching your criteria.</p>
+            <p>No facilities found matching your criteria.</p>
         </div>`;
     }
 }
+
+
 
 // ═══════════════════ REGISTRATION ═══════════════════
 function initRegistration() {
     // Tab switching
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.classList.remove('active');
+                b.setAttribute('aria-selected', 'false');
+            });
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             btn.classList.add('active');
+            btn.setAttribute('aria-selected', 'true');
             document.getElementById(btn.dataset.tab).classList.add('active');
         });
     });
@@ -474,6 +1091,9 @@ function initRegistration() {
             services: document.getElementById('hosp-services').value.trim(),
         };
 
+        const rohiniId = document.getElementById('hosp-rohini-reg').value.trim();
+        const password = document.getElementById('hosp-pwd').value;
+
         try {
             const res = await fetch('/api/register/hospital', {
                 method: 'POST',
@@ -481,19 +1101,30 @@ function initRegistration() {
                 body: JSON.stringify(payload),
             });
             const data = await res.json();
+
+            // Save to local hospital credentials store immediately
+            const hospitals = JSON.parse(localStorage.getItem(HOSPITALS_STORAGE_KEY) || '[]');
+            hospitals.push({ name: payload.name, email: payload.email, phone: payload.phone, password, rohiniId });
+            localStorage.setItem(HOSPITALS_STORAGE_KEY, JSON.stringify(hospitals));
+
             if (data.success) {
                 showSuccessModal(
                     'Hospital Registration Submitted! ✅',
-                    `${data.message}\n\nRegistration ID: ${data.registration_id}\nStatus: Pending Verification\nEstimated Review: ${data.estimated_review}`
+                    `${data.message}\n\nRegistration ID: ${data.registration_id}\nStatus: Pending Verification\nYour credentials have been configured for logins!\nRohini ID: ${rohiniId}`
                 );
                 e.target.reset();
-                showNotification('Hospital registered successfully!', 'success');
+                showNotification('Hospital registered successfully! Use your Email, Password, and Rohini ID to log in.', 'success');
             } else {
                 showNotification(data.message || 'Registration failed. Please try again.', 'error');
             }
         } catch (err) {
             console.error('Hospital registration error:', err);
-            showSuccessModal('Hospital Registration Submitted!', 'Your hospital has been registered successfully. Our verification team will review your details within 24-48 hours.');
+            // Local fallback
+            const hospitals = JSON.parse(localStorage.getItem(HOSPITALS_STORAGE_KEY) || '[]');
+            hospitals.push({ name: payload.name, email: payload.email, phone: payload.phone, password, rohiniId });
+            localStorage.setItem(HOSPITALS_STORAGE_KEY, JSON.stringify(hospitals));
+
+            showSuccessModal('Hospital Registered Locally!', 'Your hospital has been registered. You can now use your Email, Password, and Rohini ID to log in.');
             e.target.reset();
         } finally {
             submitBtn.innerHTML = origHTML;
@@ -604,6 +1235,83 @@ function showSuccessModal(title, message) {
     document.getElementById('success-modal').classList.remove('hidden');
 }
 
+// ═══════════════════ HOSPITAL DETAILS MODAL ═══════════════════
+function showHospitalDetails(name, address, city, phone, hours, type) {
+    // Find hospital data for blood stock
+    const hosp = HOSPITALS_DATA.find(h => h.name === name);
+    const typeLabel = type === 'blood-bank' ? 'Blood Bank' : type === 'government' ? 'Government Hospital' : 'Private Hospital';
+    const typeIcon = type === 'blood-bank' ? 'tint' : 'hospital';
+
+    let bloodStockHtml = '';
+    if (hosp) {
+        bloodStockHtml = `
+        <div class="hosp-detail-section">
+            <div class="hosp-detail-section-label"><i class="fas fa-droplet"></i> BLOOD STOCK</div>
+            <div class="hosp-detail-blood-grid">
+                ${Object.entries(hosp.blood).map(([bg, units]) => `
+                    <div class="hosp-detail-blood-item ${units === 0 ? 'empty' : 'has-stock'}">
+                        <span class="hosp-detail-bg">${bg}</span>
+                        <span class="hosp-detail-units">${units > 0 ? units + ' units' : 'Out of Stock'}</span>
+                    </div>
+                `).join('')}
+            </div>
+        </div>`;
+    }
+
+    const modalHtml = `
+    <div id="hospital-detail-modal" class="modal-overlay" style="display:flex;" onclick="if(event.target===this)closeHospitalDetails()">
+        <div class="modal glass-card" style="max-width:520px;width:100%;border-radius:18px;padding:0;overflow:hidden;position:relative;">
+            <button class="modal-close" aria-label="Close" onclick="closeHospitalDetails()" style="position:absolute;top:14px;right:14px;z-index:10;">&times;</button>
+            <div style="background:linear-gradient(135deg,var(--accent-rose) 0%,#7c3aed 100%);padding:28px 32px 24px;color:#fff;">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+                    <div style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:1.2rem;">
+                        <i class="fas fa-${typeIcon}"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:0.72rem;font-weight:700;opacity:0.8;letter-spacing:0.8px;text-transform:uppercase;">${typeLabel}</div>
+                        <h3 style="font-family:var(--font-display);font-size:1.1rem;font-weight:800;line-height:1.2;">${name}</h3>
+                    </div>
+                </div>
+            </div>
+            <div style="padding:24px 32px 28px;">
+                <div class="hosp-detail-section">
+                    <div class="hosp-detail-section-label"><i class="fas fa-map-marker-alt"></i> LOCATION</div>
+                    <div class="hosp-detail-value">${address}, ${city}</div>
+                </div>
+                <div class="hosp-detail-section">
+                    <div class="hosp-detail-section-label"><i class="fas fa-phone-alt"></i> CONTACT</div>
+                    <div class="hosp-detail-value"><a href="tel:${phone.replace(/\s/g, '')}" style="color:var(--accent-rose);font-weight:600;">${phone}</a></div>
+                </div>
+                <div class="hosp-detail-section">
+                    <div class="hosp-detail-section-label"><i class="fas fa-clock"></i> OPERATING HOURS</div>
+                    <div class="hosp-detail-value">${hours}</div>
+                </div>
+                ${bloodStockHtml}
+                <div style="display:flex;gap:10px;margin-top:20px;">
+                    <a href="tel:${phone.replace(/\s/g, '')}" class="btn btn-primary" style="flex:1;justify-content:center;">
+                        <i class="fas fa-phone-alt"></i> Call Now
+                    </a>
+                    <button type="button" class="btn btn-outline-dark" style="flex:1;justify-content:center;" onclick="closeHospitalDetails()">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>`;
+
+    const container = document.createElement('div');
+    container.id = 'hospital-detail-wrapper';
+    container.innerHTML = modalHtml;
+    document.body.appendChild(container);
+    document.body.style.overflow = 'hidden';
+}
+
+function closeHospitalDetails() {
+    const wrapper = document.getElementById('hospital-detail-wrapper');
+    if (wrapper) wrapper.remove();
+    document.body.style.overflow = '';
+}
+
 // ═══════════════════ EMERGENCY MODAL ═══════════════════
 function initEmergencyModal() {
     const modal = document.getElementById('emergency-modal');
@@ -651,8 +1359,12 @@ function initChatbot() {
 
 function toggleChatbot(forceOpen) {
     const panel = document.getElementById('chatbot-panel');
+    const toggleBtn = document.getElementById('chatbot-toggle');
     chatOpen = forceOpen !== undefined ? forceOpen : !chatOpen;
     panel.classList.toggle('hidden', !chatOpen);
+    if (toggleBtn) {
+        toggleBtn.setAttribute('aria-expanded', chatOpen ? 'true' : 'false');
+    }
     if (chatOpen) document.getElementById('chatbot-input').focus();
 }
 
@@ -849,17 +1561,24 @@ function escapeHtml(text) {
 
 // ═══════════════════ NOTIFICATIONS ═══════════════════
 function showNotification(message, type = 'info') {
+    const palette = {
+        success: { bg: 'rgba(22,163,74,0.12)', border: 'rgba(22,163,74,0.3)', color: '#16a34a' },
+        error: { bg: 'rgba(225,29,72,0.12)', border: 'rgba(225,29,72,0.35)', color: '#e11d48' },
+        warning: { bg: 'rgba(234,179,8,0.12)', border: 'rgba(234,179,8,0.3)', color: '#ca8a04' },
+        info: { bg: 'rgba(6,182,212,0.12)', border: 'rgba(6,182,212,0.3)', color: '#0891b2' },
+    };
+    const p = palette[type] || palette.info;
+
     const el = document.createElement('div');
     el.style.cssText = `
         position:fixed; top:90px; right:24px; z-index:9999;
-        padding:14px 24px; border-radius:12px; font-size:0.9rem; font-weight:500;
-        background:${type === 'warning' ? 'rgba(234,179,8,0.15)' : 'rgba(6,182,212,0.15)'};
-        border:1px solid ${type === 'warning' ? 'rgba(234,179,8,0.3)' : 'rgba(6,182,212,0.3)'};
-        color:${type === 'warning' ? '#eab308' : '#06b6d4'};
-        backdrop-filter:blur(12px); animation:fadeInDown 0.3s ease;
-        max-width:350px; box-shadow:0 8px 32px rgba(0,0,0,0.3);
+        padding:13px 22px; border-radius:12px; font-size:0.88rem; font-weight:600;
+        background:${p.bg}; border:1.5px solid ${p.border}; color:${p.color};
+        backdrop-filter:blur(14px); animation:fadeInDown 0.3s ease;
+        max-width:360px; box-shadow:0 8px 32px rgba(0,0,0,0.18);
+        display:flex; align-items:flex-start; gap:8px; line-height:1.4;
     `;
     el.textContent = message;
     document.body.appendChild(el);
-    setTimeout(() => { el.style.animation = 'fadeIn 0.3s ease reverse'; setTimeout(() => el.remove(), 300); }, 3000);
+    setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity 0.3s ease'; setTimeout(() => el.remove(), 320); }, 3500);
 }
